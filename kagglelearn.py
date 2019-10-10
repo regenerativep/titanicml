@@ -1,6 +1,7 @@
+# a function that predicts survivors using a random forest. based on the tutorials on kaggle
 def predict():
-    import numpy as np # linear algebra
-    import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+    import numpy as np
+    import pandas as pd
     from sklearn.ensemble import RandomForestClassifier
 
     train_data = pd.read_csv("train.csv")
