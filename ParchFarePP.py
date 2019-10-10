@@ -1,4 +1,4 @@
-def ParchFarePPpy(Parch, Fare):
+def parchFarePPpy(Parch, Fare):
     arr = [Parch, Fare]
     return arr
-print(ParchFarePPpy(5,10))
+print(parchFarePPpy(5,10))
