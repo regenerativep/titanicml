@@ -84,3 +84,13 @@ def format_ticket_class(val):
         if val == i:
             arr[i - 1] = 1
     return arr
+
+def format_sex(val):
+    arr = [0,0]
+    if not isinstance(val,str):
+        return str
+    if val == "male":
+        arr[0]=1
+    elif val == "female":
+        arr[1]=1
+    return arr
