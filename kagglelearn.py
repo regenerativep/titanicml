@@ -10,15 +10,11 @@ def predict(train_data):
 
     y = train_data["Survived"]
 
-    print(train_data)
-    print(test_data)
+    print(train_data.iloc[2])
 
-    features = ["Pclass", "Sex", "SibSp", "Parch"]
+    features = ["Pclass", "Sex", "SibSp", 'Parch']
     X = pd.get_dummies(train_data[features])
     X_test = pd.get_dummies(test_data[features])
-
-    print(X)
-    print(X_test)
 
     model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
     model.fit(X, y)
