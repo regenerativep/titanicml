@@ -1,11 +1,14 @@
-def predict(train_data):
+def predict(train_data, column_names):
     import numpy as np # linear algebra
     import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
     from sklearn.ensemble import RandomForestClassifier
 
-    test_data = pd.read_csv("test.csv")
+    test_data = pd.read_csv("test.csv", names=column_names)
 
     y = train_data["Survived"]
+
+    print(train_data)
+    print(test_data)
 
     features = ["Pclass", "Sex", "SibSp", "Parch"]
     X = pd.get_dummies(train_data[features])

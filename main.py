@@ -12,4 +12,4 @@ training_data = training_data.drop(training_data.index[0])
 #print(training_data)
 
 import kagglelearn
-kagglelearn.predict(training_data)
+kagglelearn.predict(training_data, column_names)
