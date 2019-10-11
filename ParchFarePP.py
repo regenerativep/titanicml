@@ -23,3 +23,4 @@ def FarePP(training_data):
             fares.append(fare)
             fareExists.append(1)
     return[fares,fareExists]
+
