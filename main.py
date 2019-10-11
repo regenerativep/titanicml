@@ -12,4 +12,4 @@ training_data = training_data.drop('Ticket', axis = 1)
 print(training_data)
 
 import kagglelearn
-kagglelearn.predict()
+kagglelearn.predict(training_data)
