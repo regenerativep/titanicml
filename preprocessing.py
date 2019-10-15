@@ -2,11 +2,21 @@ import math
 import pandas as pd
 
 def format_ages(age):
+    age = float(age)
     ageExists = math.isnan(age)
     if ageExists:
         return [age, 1]
     else:
         return [-1, 0]
+
+
+def preprocess(inp): #sometimes giving nan in 6th location (5th index) check on this
+    data = inp.iloc
+    processed_data = []
+    for i in range(inp.shape[0]):
+        processed_data.append(format_row(data[i]))
+    return processed_data
+
 #function that takes in a row in array form and turns it into another array
 #'ID','Pclass','Name','Sex','Age','SibSp','Parch','Ticket','Fare','Cabin','Embarked'
 def format_row(row):
@@ -32,18 +42,21 @@ def format_embark(val):
     return [0, 0, 0]
 
 def format_fare(fare):
+    fare = float(fare)
     if math.isnan(fare):
         return[-1,0]
     else:
         return[fare,1]
 
 def format_parch(parch):
+    parch = int(parch)
     if math.isnan(parch):
         return[-1,0]
     else:
         return[parch,1]
 
 def format_sibs(sibs):
+    sibs = int(sibs)
     if math.isnan(sibs):
         return[-1,0]
     else:
