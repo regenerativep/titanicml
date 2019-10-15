@@ -1,5 +1,9 @@
 import preprocessing as pp
 
+total = 0
+totalGood = 0
+showIndividualOutput = False
+
 def test(actual, desired):
     global total, totalGood, showIndividualOutput
     isGood = False
