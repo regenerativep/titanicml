@@ -1,39 +1,21 @@
 import math
 import pandas as pd
 
-def format_ages(training_data):
-    ages = []
-    ageExists = []
-    for age in training_data.get('Age'):
-        if str(age) == 'nan':
-            ages.append(-1)
-            ageExists.append(0)
-        else:
-            ages.append(age)
-            ageExists.append(1)
-    return [ages, ageExists]
+def format_ages(age):
+    ageExists = math.isnan(str(age))
+    if ageExists:
+        return [age, 1]
+    else:
+        return [-1, 0]
 
-def format_embark(training_data):
-    is_c = []
-    is_q = []
-    is_s = []
-    for i in training_data.get('Embarked'):
-        if (i == 'C'):
-            is_c.append(1)
-            is_q.append(0)
-            is_s.append(0)
-        elif (i == 'Q'):
-            is_c.append(0)
-            is_q.append(1)
-            is_s.append(0)
-        elif (i == 'S'):
-            is_c.append(0)
-            is_q.append(0)
-            is_s.append(1)
-    print (is_c)
-    print (is_q)
-    print (is_s)
-    return [is_c, is_q, is_s]
+def format_embark(val):
+    if val == 'C':
+        return [1, 0, 0]
+    elif val == 'Q':
+        return [0, 1, 0]
+    elif val == 'S':
+        return [0, 0, 1]
+    return [0, 0, 0]
 
 def format_parch_fare(Parch, Fare):
     arr = [Parch, Fare]
