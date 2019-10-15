@@ -2,7 +2,7 @@ import math
 import pandas as pd
 
 def format_ages(age):
-    ageExists = math.isnan(str(age))
+    ageExists = math.isnan(age)
     if ageExists:
         return [age, 1]
     else:
@@ -32,19 +32,19 @@ def format_embark(val):
     return [0, 0, 0]
 
 def format_fare(fare):
-    if str(fare)=='nan':
+    if math.isnan(fare):
         return[-1,0]
     else:
         return[fare,1]
 
 def format_parch(parch):
-    if str(parch) == 'nan':
+    if math.isnan(parch):
         return[-1,0]
     else:
         return[parch,1]
 
 def format_sibs(sibs):
-    if str(sibs) == 'nan':
+    if math.isnan(sibs):
         return[-1,0]
     else:
         return[sibs,1]
