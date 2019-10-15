@@ -11,8 +11,9 @@ def format_row(row):
     pprow += format_sibs(row[5])
     pprow += format_parch(row[6])
     pprow += format_fare(row[8])
-    #pprow += format_cabin(row[9])
+    #pprow += format_cabin(row[9]) format cabin does not currently exist, might add later
     pprow += format_embark(row[10])
+    return pprow
 #todo what is difference between pclass and ticket class? is ticket just the number?
 
 
