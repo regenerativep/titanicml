@@ -10,7 +10,6 @@ def predict(train_data):
 
     y = train_data["Survived"]
 
-    print(train_data.iloc[2])
 
     features = ["Pclass", "Sex", "SibSp", 'Parch']
     X = pd.get_dummies(train_data[features])
