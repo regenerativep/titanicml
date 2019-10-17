@@ -8,13 +8,16 @@ training_data = pd.read_csv("train.csv", names=column_names)
 training_data = training_data.drop(training_data.index[0])
 survived_frame = training_data["Survived"]
 training_data = training_data.drop('Survived',axis = 1)
+
+model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
+
 def predict(training_data, training_survived):
     test_data = pd.read_csv("test.csv", names=['PassengerId','Pclass','Name','Sex','Age','SibSp','Parch','Ticket','Fare','Cabin','Embarked'])
     test_data = test_data.drop(test_data.index[0])
     processed_test_data = pp.preprocess(test_data)
     processed_test_data_frame = pp.arrayRowsToDataframe(processed_test_data)
 
-    model = RandomForestClassifier(n_estimators=1000, max_depth=10, random_state=1)
+    #model = RandomForestClassifier(n_estimators=1000, max_depth=10, random_state=1)
     model.fit(training_data, training_survived)
     predictions = model.predict(processed_test_data_frame)
 

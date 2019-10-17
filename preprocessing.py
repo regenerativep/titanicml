@@ -76,6 +76,10 @@ def format_sibs(sibs):
 # take in val of (nan, 1, 2, 3). outputs array of [is first ? 1 : 0, is second ? 1 : 0, is third ? 1 : 0]
 def format_ticket_class(val):
     arr = [0, 0, 0]
+    if isinstance(val, str):
+        val = int(val)
+    if math.isnan(val):
+        return arr
     for i in range(3):
         if i + 1 == int(val):
             arr[i] = 1
@@ -84,7 +88,7 @@ def format_ticket_class(val):
 def format_sex(val):
     arr = [0,0]
     if not isinstance(val,str):
-        return str
+        return arr
     if val == "male":
         arr[0]=1
     elif val == "female":

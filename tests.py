@@ -13,7 +13,7 @@ def test(actual, desired):
     total += 1
     if showIndividualOutput:
         if isGood:
-            print("value " + str(actual) + " good")
+            print(str(actual) + " good")
         else:
             print("got value " + str(actual) + ", wanted " + str(desired))
 
@@ -21,7 +21,7 @@ def main():
     global total, totalGood, showIndividualOutput
     total = 0
     totalGood = 0
-    showIndividualOutput = False
+    showIndividualOutput = True
     test(pp.format_sex("hello"), [0, 0])
     test(pp.format_sex(""), [0, 0])
     test(pp.format_sex(float("nan")), [0, 0])

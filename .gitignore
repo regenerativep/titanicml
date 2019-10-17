@@ -108,4 +108,4 @@ venv.bak/
 # project specific
 temp.csv
 test_prediction.csv
-
+titantic_prediction.csv
