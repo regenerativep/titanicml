@@ -17,6 +17,7 @@ def predict(train_data, survived_frame):
     X_test = pd.get_dummies(test_data[features])
 
     model = MLPClassifier()
+    model.get_params(deep=True)
     model.fit(X, y)
     predictions = model.predict(X_test)
 
