@@ -10,11 +10,12 @@ training_data = pd.read_csv("train.csv", names=column_names)
 training_data = training_data.drop(training_data.index[0])
 # training_data = training_data.drop('Name', axis = 1)
 # training_data = training_data.drop('Ticket', axis = 1)
+survived_frame = training_data["Survived"]
 training_data = training_data.drop('Survived',axis = 1)
 #print(training_data)
 
 print(pp.preprocess(training_data))
 
-import kagglelearn
-# kagglelearn.predict(training_data)
+import titantic_brain
+titantic_brain.predict(training_data, survived_frame)
 
