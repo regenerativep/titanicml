@@ -17,10 +17,9 @@ def predict(train_data, survived_frame):
     X_test = pd.get_dummies(test_data[features])
 
     model = MLPClassifier()
-    model.get_params(deep=True)
     model.fit(X, y)
     predictions = model.predict(X_test)
 
     output = pd.DataFrame({'PassengerId': test_data.PassengerId, 'Survived': predictions})
-    output.to_csv('tutorial_prediction.csv', index=False)
+    output.to_csv('titantic_prediction.csv', index=False)
     print("Your submission was successfully saved!")
