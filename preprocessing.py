@@ -3,14 +3,14 @@ import pandas as pd
 
 def format_ages(age):
     age = float(age)
-    ageExists = math.isnan(age)
+    ageExists = not math.isnan(age)
     if ageExists:
         return [age, 1]
     else:
         return [-1, 0]
 
 
-def preprocess(inp): #sometimes giving nan in 6th location (5th index) check on this
+def preprocess(inp):
     data = inp.iloc
     processed_data = []
     for i in range(inp.shape[0]):
