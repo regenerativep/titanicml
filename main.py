@@ -1,6 +1,8 @@
 import pandas as pd
 import math
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import preprocessing as pp
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
@@ -53,6 +55,11 @@ def showData():
         itemStr = str(item)
         if itemStr != "nan":
             print(itemStr)
+def finish_program():
+    print('running')
+    img = mpimg.imread('titantic_img.png')
+    imgplot = plt.imshow(img)
+    plt.show()
 
 def main():
     calculatePredictions()
