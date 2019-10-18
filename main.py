@@ -10,8 +10,8 @@ training_data = training_data.drop(training_data.index[0])
 survived_frame = training_data["Survived"]
 training_data = training_data.drop('Survived',axis = 1)
 
-model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
-# model = MLPClassifier(hidden_layer_sizes=(100, 100, 100, 100), activation="logistic", solver="adam")
+# model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
+model = MLPClassifier(hidden_layer_sizes=(200, 200, 200, 200, 200, 200, 200), activation="relu", solver="adam")
 
 def predict(training_data, training_survived):
     test_data = pd.read_csv("test.csv", names=['PassengerId','Pclass','Name','Sex','Age','SibSp','Parch','Ticket','Fare','Cabin','Embarked'])
