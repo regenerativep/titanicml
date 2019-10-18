@@ -3,6 +3,7 @@ import math
 import numpy as np
 import preprocessing as pp
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
 column_names = ["PassengerId", "Survived", "Pclass", "Name", "Sex", "Age", "SibSp", "Parch", "Ticket", "Fare", "Cabin", "Embarked"]
 training_data = pd.read_csv("train.csv", names=column_names)
 training_data = training_data.drop(training_data.index[0])
@@ -10,6 +11,7 @@ survived_frame = training_data["Survived"]
 training_data = training_data.drop('Survived',axis = 1)
 
 model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
+# model = MLPClassifier(hidden_layer_sizes=(100, 100, 100, 100), activation="logistic", solver="adam")
 
 def predict(training_data, training_survived):
     test_data = pd.read_csv("test.csv", names=['PassengerId','Pclass','Name','Sex','Age','SibSp','Parch','Ticket','Fare','Cabin','Embarked'])
@@ -17,7 +19,6 @@ def predict(training_data, training_survived):
     processed_test_data = pp.preprocess(test_data)
     processed_test_data_frame = pp.arrayRowsToDataframe(processed_test_data)
 
-    #model = RandomForestClassifier(n_estimators=1000, max_depth=10, random_state=1)
     model.fit(training_data, training_survived)
     predictions = model.predict(processed_test_data_frame)
 
