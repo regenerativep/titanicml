@@ -1,6 +1,8 @@
 import pandas as pd
 import math
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import preprocessing as pp
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neural_network import MLPClassifier
@@ -12,6 +14,12 @@ training_data = training_data.drop('Survived',axis = 1)
 
 # model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=1)
 model = MLPClassifier(hidden_layer_sizes=(200, 200, 200, 200, 200, 200, 200), activation="relu", solver="adam")
+
+def finish_program():
+    print('running')
+    img = mpimg.imread('titantic_img.png')
+    imgplot = plt.imshow(img)
+    plt.show()
 
 def predict(training_data, training_survived):
     test_data = pd.read_csv("test.csv", names=['PassengerId','Pclass','Name','Sex','Age','SibSp','Parch','Ticket','Fare','Cabin','Embarked'])
@@ -25,6 +33,8 @@ def predict(training_data, training_survived):
     output = pd.DataFrame({"PassengerId": test_data.PassengerId, "Survived": predictions})
     output.to_csv("test_prediction.csv", index=False)
     print("saved predictions")
+    finish_program()
+
 
 
 dataRows = pp.preprocess(training_data)
