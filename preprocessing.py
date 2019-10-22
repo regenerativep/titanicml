@@ -35,11 +35,11 @@ def format_row(row):
     pprow += format_ticket_class(row[1]) #0, 1, 2
     pprow += format_sex(row[3]) #3, 4
     pprow += format_ages(row[4]) #5, 6
-    pprow += format_sibs(row[5])
-    pprow += format_parch(row[6])
-    pprow += format_fare(row[8])
-    #pprow += format_cabin(row[9]) format cabin does not currently exist, might add later
-    pprow += format_embark(row[10])
+    pprow += format_sibs(row[5]) #7, 8
+    pprow += format_parch(row[6]) #9, 10
+    pprow += format_fare(row[8]) #11, 12
+    pprow += format_cabin(row[9]) #13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28
+    pprow += format_embark(row[10]) #29, 30, 31
     return pprow
 #todo what is difference between pclass and ticket class? is ticket just the number?
 
@@ -93,4 +93,34 @@ def format_sex(val):
         arr[0]=1
     elif val == "female":
         arr[1]=1
+    return arr
+
+def format_single_cabin(val):
+    arr = [0, -1, 0, -1]
+    for i in range(len(val), 0, -1):
+        if arr[i - 1] == " ":
+            arr = arr[:(i - 1)] + arr[i:]
+    if len(val) == 0:
+        return arr
+    encodedLetter = encode_cabin_letter(val[0])
+    arr[0] = 1
+    arr[1] = encodedLetter
+    if len(val) > 1:
+        arr[2] = 1
+        arr[3] = int(val[1:])
+    return arr
+
+def encode_cabin_letter(val):
+    return " ABCDEFGT".find(val)
+
+def format_cabin(val):
+    if str(val) == "nan":
+        val = ""
+    parts = val.split(" ")
+    arr = []
+    for i in range(4):
+        singleVal = ""
+        if i < len(parts):
+            singleVal = parts[i]
+        arr += format_single_cabin(singleVal)
     return arr

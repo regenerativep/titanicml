@@ -35,6 +35,12 @@ def main():
     test(pp.format_ticket_class(4), [0, 0, 0])
     test(pp.format_ticket_class(float("nan")), [0, 0, 0])
 
+    test(pp.format_single_cabin("D"), [1, 4, 0, -1])
+    test(pp.format_single_cabin("D14"), [1, 4, 1, 14])
+    test(pp.format_cabin("D14"), [1, 4, 1, 14, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1])
+    test(pp.format_cabin("D14 E2"), [1, 4, 1, 14, 1, 5, 1, 2, 0, -1, 0, -1, 0, -1, 0, -1])
+    test(pp.format_cabin("D14 E2 T"), [1, 4, 1, 14, 1, 5, 1, 2, 1, 8, 0, -1, 0, -1, 0, -1])
+
     print(str(totalGood) + " / " + str(total) + " tests good")
 
 main()
