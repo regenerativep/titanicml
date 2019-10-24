@@ -44,7 +44,10 @@ class NeuralNet:
         for r in matrix:
             row = []
             for num in r:
-                row.append(num) #here is where num could be changed by an actual funtion
+                if num < 0:
+                    row.append(0)
+                else:
+                    row.append(num) #here is where num could be changed by an actual funtion
             ret.append(row)
         return ret
 
@@ -94,3 +97,6 @@ class NeuralNet:
                 if out[i] == desired_out[i]:
                     score += 1
         return score
+
+    def store_this_nn(self):
+        np.savetxt("storedNN.csv",[self.weights,self.biases],delimiter=",")
