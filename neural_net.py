@@ -42,7 +42,10 @@ class NeuralNet:
         for r in matrix:
             row = []
             for num in r:
-                row.append(num) #here is where num could be changed by an actual funtion
+                if num < 0:
+                    row.append(0)
+                else:
+                    row.append(num) #here is where num could be changed by an actual funtion
             ret.append(row)
         return ret
 
