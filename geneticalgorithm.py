@@ -2,6 +2,7 @@ import random
 import math
 import neural_net as nn
 import preprocessing as pp
+import pandas as pd
 def run_generation(organism, num_children):
     children = [organism]
     for i in range(num_children):
@@ -21,7 +22,7 @@ def run_generation(organism, num_children):
 
 def getCost(desired, actual):
     if len(desired) != len(actual):
-        return 0
+        return 333333
     amount = 0
     for i in range(len(desired)):
         desiredValue = desired[i]
@@ -31,20 +32,46 @@ def getCost(desired, actual):
         amount += diffSqr
     return amount
 
-inputs = [0, 0]
-desiredOutputs = [0]
+column_names = ["PassengerId", "Survived", "Pclass", "Name", "Sex", "Age", "SibSp", "Parch", "Ticket", "Fare", "Cabin", "Embarked"]
+training_data = pd.read_csv("train.csv", names=column_names)
+training_data = training_data.drop(training_data.index[0])
+survived_frame = training_data["Survived"]
+training_data = training_data.drop("Survived", axis = 1)
+inputDataRows = pp.preprocess(training_data)
+outputDataRows = []
+
+#inputDataRows = inputDataRows[:10]
+#outputDataRows = outputDataRows[:10]
+for i in range(survived_frame.shape[0]):
+    outputDataRows.append(survived_frame.iloc[i])
 class NeuralOrganism:
     def __init__(self, model):
         self.model = model
     def getScore(self):
-        
-        results = self.model.calculate_output(inputs)
-        cost = getCost(desiredOutputs, results)
-        return cost
+        totalCost = 0
+        for i in range(len(inputDataRows)):
+            inp = inputDataRows[i]
+            newInp = []
+            for j in inp:
+                newInp.append([j])
+            dOut = outputDataRows[i]
+            results = self.model.calculate_output(newInp)
+            actualResults = []
+            for j in results:
+                actualResults += j
+            desiredResult = []
+            if str(dOut) == "0":
+                desiredResult = [0, 1]
+            else:
+                desiredResult = [1, 0]
+            #print(str(desiredResult) + ", " + str(actualResults))
+            cost = getCost(desiredResult, actualResults)
+            totalCost += cost
+        return totalCost
     def mutate(self):
-        newOrg = nn.NeuralNet(None, self.model)
-        newOrg.mutate()
-        return newOrg
+        newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
+        newOrg.mutate(probability=0.1, severity=0.1)
+        return NeuralOrganism(newOrg)
 def copyArray(arr):
     newArr = []
     for item in arr:
@@ -95,15 +122,15 @@ def arrEquals(a, b):
     return True
 
 if __name__ == "__main__":
-    org = TestOrganism([])
-    lastCode = org.code
+    org = NeuralOrganism(nn.NeuralNet(32))
+    lastOrg = org
     gensWithoutChange = 0
     for i in range(1000):
-        childrenCount = 20 + gensWithoutChange * 20
+        childrenCount = 5 + gensWithoutChange * 5
         org = run_generation(org, childrenCount)
-        if not arrEquals(lastCode, org.code):
+        if org != lastOrg:
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
         print(str(i) + ", " + str(childrenCount) + ", score: " + str(org.getScore()))# + ", " + str(len(org.code)) + "," + codeToStr(org.code))
-        lastCode = org.code
+        lastOrg = org

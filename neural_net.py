@@ -28,14 +28,16 @@ class NeuralNet:
     def mutate(self,probability=0.1,severity=0.1):
         for w_array in self.weights:
             for row in w_array:
-                for weight in row:
+                #for weight in row:
+                for i in range(len(row)):
                     if random.random() < probability:
-                        weight += (random.random()-0.5)*severity
+                        row[i] += (random.random()-0.5)*severity
         for b_array in self.biases:
             for row in b_array:
-                for bias in row:
+                #for bias in row:
+                for i in range(len(row)):
                     if random.random() < probability:
-                        bias += (random.random()-0.5)*severity
+                        row[i] += (random.random()-0.5)*severity
 
     def act_func(self,matrix):
         ret = []
@@ -54,9 +56,24 @@ class NeuralNet:
                 self.biases.append(self.create_bias_array(self.layer_sizes[i+1]))
         else:
             self.layer_sizes = parent.layer_sizes
-            self.weights = parent.weights
-            self.biases = parent.biases
-            self.mutate()
+            self.weights = []
+            for w_array in parent.weights:
+                nw_array = []
+                for row in w_array:
+                    nrow = []
+                    for weight in row:
+                        nrow.append(weight)
+                    nw_array.append(nrow)
+                self.weights.append(nw_array)
+            self.biases = []
+            for b_array in parent.biases:
+                nb_array = []
+                for row in b_array:
+                    nrow = []
+                    for bias in row:
+                        nrow.append(bias)
+                    nb_array.append(nrow)
+                self.biases.append(nb_array)
     
     def calculate_output(self,inp): #inp is input with the correct number of inputs based on how this neural net was constructed
         matrix = inp
