@@ -80,3 +80,6 @@ class NeuralNet:
                 if out[i] == desired_out[i]:
                     score += 1
         return score
+
+    def store_this_nn(self):
+        np.savetxt("storedNN.csv",[self.weights,self.biases],delimiter=",")
