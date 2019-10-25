@@ -37,9 +37,11 @@ class NeuralOrganism:
         self.model = model
     def getScore(self):
         totalCost = 0
-        for i in range(len(inputDataRows)):
-            inp = inputDataRows[i]
-            dOut = outputDataRows[i]
+        currentInputChunk = trainingInputChunks[currentChunkIndex]
+        currentOutputChunk = trainingOutputChunks[currentChunkIndex]
+        for i in range(len(currentInputChunk)):
+            inp = currentInputChunk[i]
+            dOut = currentOutputChunk[i]
             results = self.model.calculate_output(inp)
             actualResults = []
             for j in results:
@@ -49,7 +51,7 @@ class NeuralOrganism:
         return totalCost
     def mutate(self):
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
-        newOrg.mutate(probability=0.1, severity=sev)
+        newOrg.mutate(probability=prob, severity=sev)
         return NeuralOrganism(newOrg)
 
 if __name__ == "__main__":
@@ -71,10 +73,18 @@ if __name__ == "__main__":
     outputDataRows = []
     for i in range(survived_frame.shape[0]):
         val = str(survived_frame.iloc[i])
-        item = [0, 1]
+        item = [0,]
         if val == "1":
-            item = [1, 0]
+            item = [1]
         outputDataRows.append(item)
+    #chunk training data
+    trainingInputChunks = []
+    trainingOutputChunks = []
+    chunkSize = 64
+    for i in range(0, len(inputDataRows), chunkSize):
+        trainingInputChunks.append(inputDataRows[i:i+chunkSize])
+        trainingOutputChunks.append(outputDataRows[i:i+chunkSize])
+    currentChunkIndex = 0
     #test data
     test_data = pd.read_csv("train.csv", names=column_names[:1] + column_names[2:])
     test_data = test_data.drop(test_data.index[0])
@@ -87,23 +97,28 @@ if __name__ == "__main__":
             nrow.append([item])
         inputTestRows[i] = nrow
     
-    #make natural selection
+    #do natural selection
     org = NeuralOrganism(nn.NeuralNet(32))
     lastOrg = org
-    lastScore = 901
+    lastScore = 1000000
     gensWithoutChange = 0
     sev = 0.1
-    for i in range(1000):
-        childrenCount = 5
+    prob = 0.1
+    for i in range(100):
+        childrenCount = 10
         org = run_generation(org, childrenCount)
         if org != lastOrg:
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
         lastScore = org.getScore()
-        print(str(i) + ", " + str(childrenCount) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min(math.sqrt(lastScore) / 2000, 10)
+        print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
+        sev = min(lastScore ** 2 / 20000, 2)
+        prob = min(lastScore ** 2 / 6000, 0.9)
         lastOrg = org
+        currentChunkIndex += 1
+        while currentChunkIndex >= len(trainingInputChunks):
+            currentChunkIndex -= len(trainingInputChunks)
     
     #test our model
     numberGood = 0
@@ -112,6 +127,7 @@ if __name__ == "__main__":
         dOut = outputDataRows[i]
         
         result = org.model.calculate_output(row)
+        #print("inp: " + str(row) + "dOut: " + str(dOut) + "; result: " + str(result))
         isGood = True
         for j in range(len(result)):
             resItem = result[j][0]
