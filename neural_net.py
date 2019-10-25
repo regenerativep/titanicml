@@ -45,7 +45,7 @@ class NeuralNet:
                 if num < 0:
                     row.append(0)
                 else:
-                    row.append(num) #here is where num could be changed by an actual funtion
+                    row.append(num) #ReLU
             ret.append(row)
         return ret
 
