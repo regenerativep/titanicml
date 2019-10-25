@@ -32,18 +32,6 @@ def getCost(desired, actual):
         amount += diffSqr
     return amount
 
-column_names = ["PassengerId", "Survived", "Pclass", "Name", "Sex", "Age", "SibSp", "Parch", "Ticket", "Fare", "Cabin", "Embarked"]
-training_data = pd.read_csv("train.csv", names=column_names)
-training_data = training_data.drop(training_data.index[0])
-survived_frame = training_data["Survived"]
-training_data = training_data.drop("Survived", axis = 1)
-inputDataRows = pp.preprocess(training_data)
-outputDataRows = []
-
-#inputDataRows = inputDataRows[:10]
-#outputDataRows = outputDataRows[:10]
-for i in range(survived_frame.shape[0]):
-    outputDataRows.append(survived_frame.iloc[i])
 class NeuralOrganism:
     def __init__(self, model):
         self.model = model
@@ -51,86 +39,98 @@ class NeuralOrganism:
         totalCost = 0
         for i in range(len(inputDataRows)):
             inp = inputDataRows[i]
-            newInp = []
-            for j in inp:
-                newInp.append([j])
             dOut = outputDataRows[i]
-            results = self.model.calculate_output(newInp)
+            results = self.model.calculate_output(inp)
             actualResults = []
             for j in results:
                 actualResults += j
-            desiredResult = []
-            if str(dOut) == "0":
-                desiredResult = [0, 1]
-            else:
-                desiredResult = [1, 0]
-            #print(str(desiredResult) + ", " + str(actualResults))
-            cost = getCost(desiredResult, actualResults)
+            cost = getCost(dOut, actualResults)
             totalCost += cost
         return totalCost
     def mutate(self):
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
-        newOrg.mutate(probability=0.1, severity=0.1)
+        newOrg.mutate(probability=0.1, severity=sev)
         return NeuralOrganism(newOrg)
-def copyArray(arr):
-    newArr = []
-    for item in arr:
-        newArr.append(item)
-    return newArr
-class TestOrganism:
-    def __init__(self, code):
-        self.code = code
-    def getScore(self):
-        x = 0
-        y = 0
-        for i in range(len(self.code)):
-            item = self.code[i]
-            if item == "<":
-                x -= 1
-            elif item == ">":
-                x += 1
-            elif item == "^":
-                y -= 1
-            elif item == "V":
-                y += 1
-        targetX = 128
-        targetY = 32
-        return (targetX - x) ** 2 + (targetY - y) ** 2 + len(self.code) * 10
-    def mutate(self):
-        newOrg = TestOrganism(copyArray(self.code))
-        codeLen = len(newOrg.code)
-        for i in range(len(newOrg.code), -1, -1):
-            if i != len(newOrg.code) and len(newOrg.code) > 0:
-                if random.random() < 1 / codeLen:
-                    newOrg.code[i] = random.choice(["<", ">", "^", "V"])
-                if random.random() < 1 / codeLen:
-                    del newOrg.code[i]
-            if codeLen == 0 or random.random() < 1 / codeLen:
-                newOrg.code = newOrg.code[:i] + [random.choice(["<", ">", "^", "V"])] + newOrg.code[i:]
-        return newOrg
-def codeToStr(code):
-    codeStr = ""
-    for item in code:
-        codeStr += item
-    return codeStr
-def arrEquals(a, b):
-    if len(a) != len(b):
-        return False
-    for i in range(len(a)):
-        if a[i] != b[i]:
-            return False
-    return True
 
 if __name__ == "__main__":
+    #load data
+    #training data
+    column_names = ["PassengerId", "Survived", "Pclass", "Name", "Sex", "Age", "SibSp", "Parch", "Ticket", "Fare", "Cabin", "Embarked"]
+    training_data = pd.read_csv("train.csv", names=column_names)
+    training_data = training_data.drop(training_data.index[0])
+    survived_frame = training_data["Survived"]
+    training_data = training_data.drop("Survived", axis = 1)
+    inputDataRows = pp.preprocess(training_data)
+    for i in range(len(inputDataRows)):
+        row = inputDataRows[i]
+        nrow = []
+        for j in range(len(row)):
+            item = row[j]
+            nrow.append([item])
+        inputDataRows[i] = nrow
+    outputDataRows = []
+    for i in range(survived_frame.shape[0]):
+        val = str(survived_frame.iloc[i])
+        item = [0, 1]
+        if val == "1":
+            item = [1, 0]
+        outputDataRows.append(item)
+    #test data
+    test_data = pd.read_csv("train.csv", names=column_names[:1] + column_names[2:])
+    test_data = test_data.drop(test_data.index[0])
+    inputTestRows = pp.preprocess(test_data)
+    for i in range(len(inputTestRows)):
+        row = inputTestRows[i]
+        nrow = []
+        for j in range(len(row)):
+            item = row[j]
+            nrow.append([item])
+        inputTestRows[i] = nrow
+    
+    #make natural selection
     org = NeuralOrganism(nn.NeuralNet(32))
     lastOrg = org
+    lastScore = 901
     gensWithoutChange = 0
+    sev = 0.1
     for i in range(1000):
-        childrenCount = 5 + gensWithoutChange * 5
+        childrenCount = 5
         org = run_generation(org, childrenCount)
         if org != lastOrg:
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
-        print(str(i) + ", " + str(childrenCount) + ", score: " + str(org.getScore()))# + ", " + str(len(org.code)) + "," + codeToStr(org.code))
+        lastScore = org.getScore()
+        print(str(i) + ", " + str(childrenCount) + ", sev: " + str(sev) + ", score: " + str(lastScore))
+        sev = min(math.sqrt(lastScore) / 2000, 10)
         lastOrg = org
+    
+    #test our model
+    numberGood = 0
+    for i in range(len(inputDataRows)):
+        row = inputDataRows[i]
+        dOut = outputDataRows[i]
+        
+        result = org.model.calculate_output(row)
+        isGood = True
+        for j in range(len(result)):
+            resItem = result[j][0]
+            outItem = dOut[j]
+            diff = abs(resItem - outItem)
+            if diff > 0.5:
+                isGood = False
+        if isGood:
+            numberGood += 1
+    print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)))
+    
+    #submission
+    survived_list = []
+    for row in inputTestRows:
+        result = org.model.calculate_output(row)
+        val = 0
+        if result[0][0] > 0.5:
+            val = 1
+        survived_list.append(val)
+    output_frame = pd.DataFrame({ "PassengerId": test_data.PassengerId, "Survived": survived_list})
+    output_frame.to_csv("nn_prediction.csv", index=False)
+    print("saved neural net predictions")
