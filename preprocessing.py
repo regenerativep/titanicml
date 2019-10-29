@@ -124,3 +124,12 @@ def format_cabin(val):
             singleVal = parts[i]
         arr += format_single_cabin(singleVal)
     return arr
+
+def format_log_fare(fare):
+    if math.isnan(fare):
+        return [0]
+    else:
+        return [math.log10(fare)]
+
+def format_is_along(parch, sibsp):
+    pass
