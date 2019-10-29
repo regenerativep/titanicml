@@ -96,15 +96,5 @@ class NeuralNet:
             matrix = self.act_func(matrix, self.act_func_layers[i])
         return matrix
 
-    def calculate_score(self,inp,desired_out):
-        score = -1
-        out = self.calculate_output(inp)
-        if len(out) == len(desired_out):
-            score = 0
-            for i in range(len(out)):
-                if out[i] == desired_out[i]:
-                    score += 1
-        return score
-
     def store_this_nn(self):
         np.savetxt("storedNN.csv",[self.weights,self.biases],delimiter=",")
