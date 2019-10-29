@@ -104,7 +104,7 @@ if __name__ == "__main__":
     gensWithoutChange = 0
     sev = 0.1
     prob = 0.1
-    for i in range(100):
+    for i in range(200):
         childrenCount = 10
         org = run_generation(org, childrenCount)
         if org != lastOrg:
@@ -113,7 +113,7 @@ if __name__ == "__main__":
             gensWithoutChange += 1
         lastScore = org.getScore()
         print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min(lastScore ** 2 / 20000, 2)
+        sev = min(lastScore ** 2 / 40000, 2)
         prob = min(lastScore ** 2 / 6000, 0.9)
         lastOrg = org
         currentChunkIndex += 1
@@ -147,6 +147,6 @@ if __name__ == "__main__":
         if result[0][0] > 0.5:
             val = 1
         survived_list.append(val)
-    output_frame = pd.DataFrame({ "PassengerId": test_data.PassengerId, "Survived": survived_list})
+    output_frame = pd.DataFrame({ "PassengerId": test_data.PassengerId, "Survived": survived_list} )
     output_frame.to_csv("nn_prediction.csv", index=False)
     print("saved neural net predictions")
