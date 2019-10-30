@@ -124,3 +124,40 @@ def format_cabin(val):
             singleVal = parts[i]
         arr += format_single_cabin(singleVal)
     return arr
+
+def format_age_group(data): #data is [age, age_exists]
+    if data[1] == 0:
+        return [-1, 0]
+    else:
+        return [data[0] / 20, 1]
+
+def format_family_size(data): #data is [sibSp, parch]
+    return data[0] + data[1]
+
+def format_prefix(name): #input name
+    preStr = name.split(',')[1].split(' ')[1]
+    if preStr == 'Mme.' or preStr == 'Mrs.':
+        pre = 'Mrs.'
+    elif preStr == 'Ms.' or preStr == 'Miss.' or preStr == 'Mlle.':
+        pre = 'Miss'
+    elif preStr == 'Dr.':
+        pre = 'Dr.'
+    elif preStr == "Mr.":
+        pre = 'Mr.'
+    elif preStr == 'Master':
+        pre = 'Master'
+    else:
+        pre = 'other'
+    return pre
+
+def format_cabin_letter(cabin_num): #input Cabin, returns letter if exists, else 'nAn'
+    if math.isnan(cabin_num):
+        return 'nAn'
+    else:
+        return cabin_num[0]
+
+def format_cabin_number(cabin_num): #input cabin, returns cabin number if exists, else 'nAn'
+    if math.isnan(cabin_num):
+        return 'nAn'
+    else:
+        return cabin_num[1:]

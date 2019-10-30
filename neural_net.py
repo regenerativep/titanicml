@@ -77,7 +77,7 @@ class NeuralNet:
                         nrow.append(bias)
                     nb_array.append(nrow)
                 self.biases.append(nb_array)
-    
+    #outputs matrix of survived
     def calculate_output(self,inp): #inp is input with the correct number of inputs based on how this neural net was constructed
         matrix = inp
         for i in range(len(self.weights)):
@@ -88,7 +88,7 @@ class NeuralNet:
             matrix = self.act_func(matrix)
         return matrix
 
-    def calculate_score(self,inp,desired_out):
+    def calculate_score(self,inp,desired_out): #bad function
         score = -1
         out = self.calculate_output(inp)
         if len(out) == len(desired_out):
