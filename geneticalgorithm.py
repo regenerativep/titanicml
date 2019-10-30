@@ -98,7 +98,7 @@ if __name__ == "__main__":
         inputTestRows[i] = nrow
     
     #do natural selection
-    org = NeuralOrganism(nn.NeuralNet(32))
+    org = NeuralOrganism(nn.NeuralNet(46))
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
