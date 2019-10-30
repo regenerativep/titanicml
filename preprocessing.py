@@ -43,7 +43,9 @@ def format_row(row):
     mother = format_ismother(sex[0] == 0, title[0], parch[0])
     father = format_isfather(sex[0] == 1, title[0], parch[0], sibsp[0])
     free = format_isfree(fare[0])
-    return ticket_class + sex + ages + sibsp + parch + fare + cabin + embark + mother + father + free
+    alone = format_is_alone(parch[0],sibsp[0])
+    log_fare = format_log_fare(fare[0])
+    return ticket_class + sex + ages + sibsp + parch + fare + cabin + embark + mother + father + free + alone + log_fare
 #todo what is difference between pclass and ticket class? is ticket just the number?
 
 def format_ismother(isfemale, title, parch):
@@ -177,11 +179,20 @@ def format_cabin_number(cabin_num): #input cabin, returns cabin number if exists
         return 'nAn'
     else:
         return cabin_num[1:]
+
 def format_log_fare(fare):
     if math.isnan(fare):
         return [0]
     else:
         return [math.log10(fare)]
 
-def format_is_along(parch, sibsp):
-    pass
+def format_is_alone(parch, sibsp):
+    family = 0
+    if parch == -1 and sibsp == -1:
+        return [-1]
+    else:
+        family += math.max(parch,0) + math.max(sibsp,0)
+        if family > 0:
+            return [0]
+        else:
+            return [1]
