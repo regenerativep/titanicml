@@ -39,26 +39,34 @@ class NeuralNet:
                     if random.random() < probability:
                         row[i] += (random.random()-0.5)*severity
 
-    def act_func(self,matrix):
+    def act_func(self, matrix, ind):
         ret = []
         for r in matrix:
             row = []
             for num in r:
-                if num < 0:
-                    row.append(0)
-                else:
-                    row.append(num) #ReLU
+                result = None
+                if ind == 0: #relu
+                    if num < 0:
+                        result = 0
+                    else:
+                        result = num
+                elif ind == 1: #sigmoid
+                    ex = math.e ** num
+                    result = ex / (ex + 1)
+                row.append(result)
             ret.append(row)
         return ret
 
     def __init__(self,input_size,parent=None):
         if parent == None:
-            self.layer_sizes = [input_size, 32, 32, 32, 16, 8, 2]
+            self.layer_sizes = [input_size, 48, 64, 32, 16, 16, 8, 1]
+            self.act_func_layers = [0, 0, 1, 1, 1, 1, 1, 1]
             for i in range(len(self.layer_sizes)-1):
                 self.weights.append(self.create_weight_array(self.layer_sizes[i],self.layer_sizes[i+1]))
                 self.biases.append(self.create_bias_array(self.layer_sizes[i+1]))
         else:
             self.layer_sizes = parent.layer_sizes
+            self.act_func_layers = parent.act_func_layers
             self.weights = []
             for w_array in parent.weights:
                 nw_array = []
@@ -85,7 +93,7 @@ class NeuralNet:
             b = self.biases[i]
             matrix = np.matmul(w,matrix)
             matrix = np.add(matrix,b)
-            matrix = self.act_func(matrix)
+            matrix = self.act_func(matrix, self.act_func_layers[i])
         return matrix
 
     def calculate_score(self,inp,desired_out): #bad function

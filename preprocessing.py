@@ -31,17 +31,33 @@ def format_ages(age):
 #function that takes in a row in array form and turns it into another array
 #'ID','Pclass','Name','Sex','Age','SibSp','Parch','Ticket','Fare','Cabin','Embarked'
 def format_row(row):
-    pprow = []
-    pprow += format_ticket_class(row[1]) #0, 1, 2
-    pprow += format_sex(row[3]) #3, 4
-    pprow += format_ages(row[4]) #5, 6
-    pprow += format_sibs(row[5]) #7, 8
-    pprow += format_parch(row[6]) #9, 10
-    pprow += format_fare(row[8]) #11, 12
-    pprow += format_cabin(row[9]) #13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28
-    pprow += format_embark(row[10]) #29, 30, 31
-    return pprow
+    ticket_class = format_ticket_class(row[1]) #0, 1, 2
+    sex = format_sex(row[3]) #3, 4
+    ages = format_ages(row[4]) #5, 6
+    sibsp = format_sibs(row[5]) #7, 8
+    parch = format_parch(row[6]) #9, 10
+    fare = format_fare(row[8]) #11, 12
+    cabin = format_cabin(row[9]) #13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28
+    embark = format_embark(row[10]) #29, 30, 31
+    #engineered features
+    mother = format_ismother(sex[0] == 0, title[0], parch[0])
+    father = format_isfather(sex[0] == 1, title[0], parch[0], sibsp[0])
+    free = format_isfree(fare[0])
+    return ticket_class + sex + ages + sibsp + parch + fare + cabin + embark + mother + father + free
 #todo what is difference between pclass and ticket class? is ticket just the number?
+
+def format_ismother(isfemale, title, parch):
+    if isfemale and title == 0 and parch >= 1:
+        return [1]
+    return [0]
+def format_isfather(ismale, title, parch, sibsp):
+    if ismale and title == 1 and parch >= 1 and sibsp >= 1:
+        return [1]
+    return [0]
+def format_isfree(fare):
+    if fare[0] == 0:
+        return [1]
+    return [0]
 
 def format_embark(val):
     if val == 'C':
@@ -161,3 +177,11 @@ def format_cabin_number(cabin_num): #input cabin, returns cabin number if exists
         return 'nAn'
     else:
         return cabin_num[1:]
+def format_log_fare(fare):
+    if math.isnan(fare):
+        return [0]
+    else:
+        return [math.log10(fare)]
+
+def format_is_along(parch, sibsp):
+    pass
