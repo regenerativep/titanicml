@@ -80,7 +80,7 @@ if __name__ == "__main__":
     #chunk training data
     trainingInputChunks = []
     trainingOutputChunks = []
-    chunkSize = 64
+    chunkSize = 128
     for i in range(0, len(inputDataRows), chunkSize):
         trainingInputChunks.append(inputDataRows[i:i+chunkSize])
         trainingOutputChunks.append(outputDataRows[i:i+chunkSize])
@@ -113,7 +113,7 @@ if __name__ == "__main__":
             gensWithoutChange += 1
         lastScore = org.getScore()
         print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min(lastScore ** 2 / 40000, 2)
+        sev = min(lastScore ** 2 / 100000, 2)
         prob = min(lastScore ** 2 / 6000, 0.9)
         lastOrg = org
         currentChunkIndex += 1

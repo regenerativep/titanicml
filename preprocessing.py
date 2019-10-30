@@ -40,15 +40,23 @@ def format_row(row):
     cabin = format_cabin(row[9]) #13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28
     embark = format_embark(row[10]) #29, 30, 31
     #engineered features
-    title = format_prefix(row[2])
-    age_group = format_age_group(ages)
-    family_size = format_family_size([sibsp[0], parch[0]])
-    mother = format_ismother(sex[0] == 0, title[0], parch[0])
-    father = format_isfather(sex[0] == 1, title[0], parch[0], sibsp[0])
-    free = format_isfree(fare[0])
-    log_fare = format_log_fare(fare[0])
-    is_alone = format_is_alone(parch[0], sibsp[0])
-    return ticket_class + sex + ages + sibsp + parch + fare + cabin + embark + title + age_group + family_size + mother + father + free + log_fare + is_alone
+    title = format_prefix(row[2]) #32, 33, 34, 35, 36, 37
+    age_group = format_age_group(ages) #38, 39
+    family_size = format_family_size([sibsp[0], parch[0]]) #40
+    mother = format_ismother(sex[0] == 0, title[0], parch[0]) #41
+    father = format_isfather(sex[0] == 1, title[0], parch[0], sibsp[0]) #42
+    free = format_isfree(fare[0]) #43
+    log_fare = format_log_fare(fare[0]) #44
+    is_alone = format_is_alone(parch[0], sibsp[0]) #45
+    inpRow = ticket_class + sex + ages + sibsp + parch + fare + cabin + embark + title + age_group + family_size + mother + father + free + log_fare + is_alone
+    ind = 0
+    if len(inpRow) != 46:
+        print(inpRow)
+    for item in inpRow:
+        if math.isnan(item):
+            print(ind)
+        ind += 1
+    return inpRow
 #todo what is difference between pclass and ticket class? is ticket just the number?
 
 def format_ismother(isfemale, title, parch):
@@ -60,7 +68,7 @@ def format_isfather(ismale, title, parch, sibsp):
         return [1]
     return [0]
 def format_isfree(fare):
-    if fare[0] == 0:
+    if fare == 0:
         return [1]
     return [0]
 
@@ -153,7 +161,7 @@ def format_age_group(data): #data is [age, age_exists]
         return [data[0] / 20, 1]
 
 def format_family_size(data): #data is [sibSp, parch]
-    return data[0] + data[1]
+    return [data[0] + data[1]]
 
 def format_prefix(name): #input name, return [ismrs, ismiss, isdr, ismr, ismaster, isother]
     preStr = name.split(',')[1].split(' ')[1]
@@ -193,7 +201,7 @@ def format_log_fare(fare):
     if math.isnan(fare):
         return [0]
     else:
-        return [math.log10(fare)]
+        return [math.log10(fare + 1.1)]
 
 def format_is_alone(parch, sibsp):
     family = 0
