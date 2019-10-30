@@ -150,33 +150,40 @@ def format_age_group(data): #data is [age, age_exists]
 def format_family_size(data): #data is [sibSp, parch]
     return data[0] + data[1]
 
-def format_prefix(name): #input name
+def format_prefix(name): #input name, return [ismrs, ismiss, isdr, ismr, ismaster, isother]
     preStr = name.split(',')[1].split(' ')[1]
     if preStr == 'Mme.' or preStr == 'Mrs.':
-        pre = 'Mrs.'
+        return [1, 0, 0, 0, 0, 0]
     elif preStr == 'Ms.' or preStr == 'Miss.' or preStr == 'Mlle.':
-        pre = 'Miss'
+        return [0, 1, 0, 0, 0, 0]
     elif preStr == 'Dr.':
-        pre = 'Dr.'
+        return [0, 0, 1, 0, 0, 0]
     elif preStr == "Mr.":
-        pre = 'Mr.'
+        return [0, 0, 0, 1, 0, 0]
     elif preStr == 'Master':
-        pre = 'Master'
+        return [0, 0, 0, 0, 1, 0]
     else:
-        pre = 'other'
-    return pre
+        return [0, 0, 0, 0, 0, 1]
+    
 
-def format_cabin_letter(cabin_num): #input Cabin, returns letter if exists, else 'nAn'
-    if math.isnan(cabin_num):
-        return 'nAn'
-    else:
-        return cabin_num[0]
+def format_cabin_letter(cabin_num): #input Cabin, returns [letter1, letter3, letter4, l1_exists, l2_exists, l3_exists, l4_exists]
+    cabins = cabin_num.split(' ')
+    alphabet = 'ABCDEFGH'
+    ret = [-1, -1, -1, -1, 0, 0, 0, 0]
+    for i in range(len(cabins) - 1):
+        if not math.isnan(cabins[i]):
+            ret[i] = alphabet.index(cabins[i][0])
+            ret[i + 4] = 1
 
-def format_cabin_number(cabin_num): #input cabin, returns cabin number if exists, else 'nAn'
-    if math.isnan(cabin_num):
-        return 'nAn'
-    else:
-        return cabin_num[1:]
+def format_cabin_number(cabin_num): #input cabin, returns [n1, n2, n3, n4, n1_exists, n2_exists, n3_exists, n4_exists]
+    cabins = cabin_num.split(' ')
+    ret = [-1, -1, -1, -1, 0, 0, 0, 0]
+    cabins = cabin_num.split(' ')
+    for i in range(len(cabins) - 1):
+        if not math.isnan(cabins[i]):
+            ret[i] = cabins[i][1:]
+            ret[i + 4] = 1
+
 def format_log_fare(fare):
     if math.isnan(fare):
         return [0]
