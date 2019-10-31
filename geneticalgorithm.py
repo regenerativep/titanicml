@@ -80,14 +80,16 @@ if __name__ == "__main__":
     #chunk training data
     trainingInputChunks = []
     trainingOutputChunks = []
-    chunkSize = 128
+    chunkSize = len(inputDataRows) #no chunking
     for i in range(0, len(inputDataRows), chunkSize):
         trainingInputChunks.append(inputDataRows[i:i+chunkSize])
         trainingOutputChunks.append(outputDataRows[i:i+chunkSize])
     currentChunkIndex = 0
     #test data
-    test_data = pd.read_csv("train.csv", names=column_names[:1] + column_names[2:])
+    #test_data = pd.read_csv("train.csv", names=(column_names[:1] + column_names[2:]))
+    test_data = pd.read_csv("test.csv", names=['PassengerId','Pclass','Name','Sex','Age','SibSp','Parch','Ticket','Fare','Cabin','Embarked'])
     test_data = test_data.drop(test_data.index[0])
+    passengerIds = test_data["PassengerId"]
     inputTestRows = pp.preprocess(test_data)
     for i in range(len(inputTestRows)):
         row = inputTestRows[i]
@@ -104,7 +106,7 @@ if __name__ == "__main__":
     gensWithoutChange = 0
     sev = 0.1
     prob = 0.1
-    for i in range(200):
+    for i in range(10):
         childrenCount = 10
         org = run_generation(org, childrenCount)
         if org != lastOrg:
@@ -113,8 +115,8 @@ if __name__ == "__main__":
             gensWithoutChange += 1
         lastScore = org.getScore()
         print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min(lastScore ** 2 / 100000, 2)
-        prob = min(lastScore ** 2 / 6000, 0.9)
+        sev = min(lastScore ** 2 / 500000, 2)
+        prob = min(lastScore ** 2 / 600000, 0.9)
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
@@ -147,6 +149,6 @@ if __name__ == "__main__":
         if result[0][0] > 0.5:
             val = 1
         survived_list.append(val)
-    output_frame = pd.DataFrame({ "PassengerId": test_data.PassengerId, "Survived": survived_list} )
+    output_frame = pd.DataFrame({ "PassengerId": test_data["PassengerId"], "Survived": survived_list} )
     output_frame.to_csv("nn_prediction.csv", index=False)
     print("saved neural net predictions")
