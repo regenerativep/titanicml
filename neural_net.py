@@ -59,8 +59,13 @@ class NeuralNet:
 
     def __init__(self,input_size,parent=None):
         if parent == None:
+<<<<<<< HEAD
             self.layer_sizes = [input_size, 64, 64, 64, 64, 64, 64, 1]
             self.act_func_layers = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+=======
+            self.layer_sizes = [input_size, 48, 64, 64, 64, 64, 64, 1]
+            self.act_func_layers = [0, 0, 0, 0, 0, 1, 1, 1]
+>>>>>>> df2ceef9cc791b7b013360ce7dbc2753a5286738
             for i in range(len(self.layer_sizes)-1):
                 self.weights.append(self.create_weight_array(self.layer_sizes[i],self.layer_sizes[i+1]))
                 self.biases.append(self.create_bias_array(self.layer_sizes[i+1]))

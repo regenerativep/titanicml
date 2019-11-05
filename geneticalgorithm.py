@@ -35,8 +35,9 @@ def getCost(desired, actual):
 class NeuralOrganism:
     def __init__(self, model):
         self.model = model
-    def getScore(self):
+    def getScore(self,prnt=False):
         totalCost = 0
+        totalCorrect = 0
         currentInputChunk = trainingInputChunks[currentChunkIndex]
         currentOutputChunk = trainingOutputChunks[currentChunkIndex]
         for i in range(len(currentInputChunk)):
@@ -46,8 +47,15 @@ class NeuralOrganism:
             actualResults = []
             for j in results:
                 actualResults += j
+            if prnt:
+                print(dOut)
+                print(actualResults)
             cost = getCost(dOut, actualResults)
+            if abs(dOut[0]-actualResults[0]) < 0.5:
+                totalCorrect += 1
             totalCost += cost
+        if prnt:
+            print("correct: "+str(totalCorrect))
         return totalCost
     def mutate(self):
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
