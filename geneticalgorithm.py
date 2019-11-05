@@ -81,10 +81,30 @@ if __name__ == "__main__":
     trainingInputChunks = []
     trainingOutputChunks = []
     #chunkSize = len(inputDataRows) #no chunking
-    chunkSize = 128
-    for i in range(0, len(inputDataRows), chunkSize):
-        trainingInputChunks.append(inputDataRows[i:i+chunkSize])
-        trainingOutputChunks.append(outputDataRows[i:i+chunkSize])
+    chunkSize = 384
+    chunkItems = []
+    chunkOutItems = []
+    dataToChunk = []
+    outputDataToChunk = []
+    for i in range(len(inputDataRows)):
+        dataToChunk.append(inputDataRows[i])
+    for i in range(len(outputDataRows)):
+        outputDataToChunk.append(outputDataRows[i])
+    while len(dataToChunk) > 0:
+        if len(chunkItems) >= chunkSize:
+            trainingInputChunks.append(chunkItems)
+            trainingOutputChunks.append(chunkOutItems)
+            chunkItems = []
+            chunkOutputItems = []
+        else:
+            dataToChunkLen = len(dataToChunk)
+            itemInd = random.randint(0, dataToChunkLen - 1)
+            inpItem = dataToChunk[itemInd]
+            outItem = outputDataToChunk[itemInd]
+            dataToChunk.remove(inpItem)
+            outputDataToChunk.remove(outItem)
+            chunkItems.append(inpItem)
+            chunkOutItems.append(outItem)
     currentChunkIndex = 0
     #test data
     #test_data = pd.read_csv("train.csv", names=(column_names[:1] + column_names[2:]))
@@ -107,18 +127,18 @@ if __name__ == "__main__":
     gensWithoutChange = 0
     sev = 0.1
     prob = 0.1
-    generations = 5
+    generations = 20
     for i in range(generations):
-        childrenCount = 10
+        childrenCount = 5
         org = run_generation(org, childrenCount)
         if org != lastOrg:
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
-        lastScore = org.getScore()
+        lastScore = org.getScore() / chunkSize
         print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min(lastScore ** 2 / 50000, 2)
-        prob = min(lastScore ** 2 / 600000, 0.9)
+        sev = min((lastScore ** 2) * ( 1 / 5 ), 2)
+        prob = min((lastScore ** 2) * ( 1 / 4 ), 0.9)
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
@@ -126,12 +146,14 @@ if __name__ == "__main__":
     
     #test our model
     numberGood = 0
+    strOfResults = ""
     for i in range(len(inputDataRows)):
         row = inputDataRows[i]
         dOut = outputDataRows[i]
         
         result = org.model.calculate_output(row)
-        print("inp: " + str(row) + "dOut: " + str(dOut) + "; result: " + str(result))
+        #print("inp: " + str(row) + "dOut: " + str(dOut) + "; result: " + str(result))
+        strOfResults += str(result[0][0]) + ", "
         isGood = True
         for j in range(len(result)):
             resItem = result[j][0]
@@ -141,6 +163,7 @@ if __name__ == "__main__":
                 isGood = False
         if isGood:
             numberGood += 1
+    print(strOfResults)
     print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)))
     
     #submission
