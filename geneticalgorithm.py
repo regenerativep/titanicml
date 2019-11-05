@@ -35,8 +35,9 @@ def getCost(desired, actual):
 class NeuralOrganism:
     def __init__(self, model):
         self.model = model
-    def getScore(self):
+    def getScore(self,prnt=False):
         totalCost = 0
+        totalCorrect = 0
         currentInputChunk = trainingInputChunks[currentChunkIndex]
         currentOutputChunk = trainingOutputChunks[currentChunkIndex]
         for i in range(len(currentInputChunk)):
@@ -46,8 +47,15 @@ class NeuralOrganism:
             actualResults = []
             for j in results:
                 actualResults += j
+            if prnt:
+                print(dOut)
+                print(actualResults)
             cost = getCost(dOut, actualResults)
+            if abs(dOut[0]-actualResults[0]) < 0.5:
+                totalCorrect += 1
             totalCost += cost
+        if prnt:
+            print("correct: "+str(totalCorrect))
         return totalCost
     def mutate(self):
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
@@ -113,10 +121,10 @@ if __name__ == "__main__":
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
-        lastScore = org.getScore()
-        print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min(lastScore ** 2 / 500000, 2)
-        prob = min(lastScore ** 2 / 600000, 0.9)
+        lastScore = org.getScore(True)
+        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
+        sev = min(lastScore ** 2 / 250000, 2)
+        prob = min(lastScore ** 2 / 300000, 0.9)
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
