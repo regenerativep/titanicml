@@ -107,7 +107,7 @@ if __name__ == "__main__":
     gensWithoutChange = 0
     sev = 0.1
     prob = 0.1
-    generations = 5
+    generations = 50
     for i in range(generations):
         childrenCount = 10
         org = run_generation(org, childrenCount)
