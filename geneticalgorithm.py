@@ -115,7 +115,7 @@ if __name__ == "__main__":
     gensWithoutChange = 0
     sev = 0.1
     prob = 0.1
-    generations = 5
+    generations = 10
     for i in range(generations):
         childrenCount = 10
         org = run_generation(org, childrenCount)
@@ -123,9 +123,8 @@ if __name__ == "__main__":
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
-        lastScore = org.getScore()
-        print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min(lastScore ** 2 / 50000, 2)
+        lastScore = org.getScore(True)
+        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))        
         prob = min(lastScore ** 2 / 600000, 0.9)
         lastOrg = org
         currentChunkIndex += 1
@@ -139,7 +138,7 @@ if __name__ == "__main__":
         dOut = outputDataRows[i]
         
         result = org.model.calculate_output(row)
-        print("inp: " + str(row) + "dOut: " + str(dOut) + "; result: " + str(result))
+        #print("inp: " + str(row) + "dOut: " + str(dOut) + "; result: " + str(result))
         isGood = True
         for j in range(len(result)):
             resItem = result[j][0]
