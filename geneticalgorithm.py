@@ -145,8 +145,8 @@ if __name__ == "__main__":
             gensWithoutChange += 1
         lastScore = org.getScore() / chunkSize
         print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min((lastScore ** 2) * ( 1 / 5 ), 2)
-        prob = min((lastScore ** 2) * ( 1 / 4 ), 0.9)
+        sev = min((lastScore ** 2) * ( 1 ), 2)
+        prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
