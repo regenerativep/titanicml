@@ -133,9 +133,9 @@ if __name__ == "__main__":
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    sev = 0.1
+    sev = 0.5
     prob = 0.1
-    generations = 50
+    generations = 2
     for i in range(generations):
         childrenCount = 5
         org = run_generation(org, childrenCount)
@@ -145,7 +145,7 @@ if __name__ == "__main__":
             gensWithoutChange += 1
         lastScore = org.getScore() / chunkSize
         print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min((lastScore ** 2) * ( 1 ), 2)
+        sev = min((lastScore ** 2) * ( 1000000 ), 20)
         prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
         lastOrg = org
         currentChunkIndex += 1
@@ -172,7 +172,7 @@ if __name__ == "__main__":
         if isGood:
             numberGood += 1
     print(strOfResults)
-    print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)))
+    print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)) + ', ' + str((numberGood / len(inputDataRows) * 100)) + '%')
     
     #submission
     survived_list = []
