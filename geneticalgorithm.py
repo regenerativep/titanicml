@@ -58,14 +58,16 @@ class NeuralOrganism:
             for j in results:
                 actualResults += j
             if prnt:
-                print(dOut)
-                print(actualResults)
+                pass
+                #print(dOut)
+                #print(actualResults)
             cost = getCost(dOut, actualResults)
             if abs(dOut[0]-actualResults[0]) < 0.5:
                 totalCorrect += 1
             totalCost += cost
         if prnt:
-            print("correct: "+str(totalCorrect))
+            pass
+            #print("correct: "+str(totalCorrect))
         return totalCost
     def mutate(self):
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
@@ -138,14 +140,18 @@ if __name__ == "__main__":
             nrow.append([item])
         inputTestRows[i] = nrow
     
+    #create organism
+    model = nn.NeuralNet(46).load("nndata.json")
+    org = NeuralOrganism(model)
+
     #do natural selection
-    org = NeuralOrganism(nn.NeuralNet(46))
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 10
+    generations = 5
+    childrenCount = 0
     for i in range(generations):
-        childrenCount = 5
+        #childrenCount = 5
         org = run_generation(org)#, childrenCount)
         if org != lastOrg:
             gensWithoutChange = 0
@@ -159,6 +165,9 @@ if __name__ == "__main__":
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
             currentChunkIndex -= len(trainingInputChunks)
+
+    #save model
+    org.model.save("nndata.json")
     
     #test our model
     strOfResults = ""

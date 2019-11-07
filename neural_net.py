@@ -3,6 +3,7 @@ import math
 import numpy as np
 import preprocessing as pp
 import random
+import json
 class NeuralNet:
     #matricies are row, column
     layer_sizes = []
@@ -60,7 +61,6 @@ class NeuralNet:
                 row.append(result)
             ret.append(row)
         return ret
-
     def __init__(self,input_size,parent=None):
         if parent == None:
             self.severity = 1
@@ -114,5 +114,26 @@ class NeuralNet:
                     score += 1
         return score
 
-    def store_this_nn(self):
-        np.savetxt("storedNN.csv",[self.weights,self.biases],delimiter=",")
+    def save(self, filename):
+        with open(filename, "w") as file:
+            json.dump({
+                "weights": self.weights,
+                "biases": self.biases,
+                "sizes": self.layer_sizes,
+                "activations": self.act_func_layers,
+                "severity": self.severity,
+                "probability": self.probability
+            }, file)
+            print("saved neural net to " + filename)
+            return self
+    def load(self, filename):
+        with open(filename, "r") as file:
+            json_data = json.loads(file.read())
+            self.weights = json_data["weights"]
+            self.biases = json_data["biases"]
+            self.layer_sizes = json_data["sizes"]
+            self.act_func_layers = json_data["activations"]
+            self.severity = json_data["severity"]
+            self.probability = json_data["probability"]
+            print("opened neural net from " + filename)
+            return self
