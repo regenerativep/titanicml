@@ -27,7 +27,7 @@ def run_generation(organism):
         mutatedOrg = organism.mutate()
         score = mutatedOrg.getScore() / chunkSize
         childrenCount += 1
-        print("ran a child: " + str(score))
+        print("ran a child: " + str(score) + " | " + str(lastScore))
     return mutatedOrg
 
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 20
+    generations = 10
     childrenCount = 0
     for i in range(generations):
         #childrenCount = 5
@@ -197,6 +197,9 @@ if __name__ == "__main__":
     org.model.save("nndata.json")
     
     #test our model
+    numberGood = 0
+    numSurvivedCorrect = 0
+    totalSurvived = 0
     strOfResults = ""
     resultList = []
     totalOuts = 0
@@ -223,8 +226,15 @@ if __name__ == "__main__":
             diff = abs(resItem - outItem)
             if diff > 0.5:
                 isGood = False
+            if outItem == 1:
+                totalSurvived += 1
+                if isGood:
+                    numSurvivedCorrect += 1
         if isGood:
             numberGood += 1
+    #print(strOfResults)
+    print("tests good for " + str(numSurvivedCorrect)+"/"+str(totalSurvived)+" survival predictions")
+    print("tests good for " + str(numberGood - numSurvivedCorrect)+"/"+str(len(inputDataRows)-totalSurvived)+" death predictions")
     print(strOfResults)
     print("avg: " + str(avg))
     print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)) + ', ' + str((numberGood / len(inputDataRows) * 100)) + '%')
