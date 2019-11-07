@@ -143,7 +143,7 @@ if __name__ == "__main__":
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 20
+    generations = 10
     for i in range(generations):
         childrenCount = 5
         org = run_generation(org)#, childrenCount)
@@ -151,8 +151,10 @@ if __name__ == "__main__":
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
-        lastScore = org.getScore() / chunkSize
-        print(str(i) + ", " + str(childrenCount) + ", prob: " + str(org.model.probability) + ", sev: " + str(org.model.severity) + ", score: " + str(lastScore))
+        lastScore = org.getScore(True) / chunkSize
+        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(org.model.probability) + ", sev: " + str(org.model.severity) + ", score: " + str(lastScore))
+        #sev = min((lastScore ** 2) * ( 1 ), 2)
+        #prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
