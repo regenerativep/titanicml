@@ -153,15 +153,15 @@ if __name__ == "__main__":
         inputTestRows[i] = nrow
     
     #create organism
-    model = nn.NeuralNet(46).load("nndata.json")
-    #model = nn.NeuralNet(46)
+    #model = nn.NeuralNet(46).load("nndata.json")
+    model = nn.NeuralNet(46)
     org = NeuralOrganism(model)
 
     #do natural selection
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 10
+    generations = 5
     childrenCount = 0
     for i in range(generations):
         #childrenCount = 5
