@@ -28,9 +28,9 @@ class NeuralNet:
     def mutate(self):
         def randNum():
             return (random.random()-0.5)*self.severity
-        self.probability += randNum() / 10
+        self.probability += randNum() / 100
         self.probability = min(1, max(0, self.probability))
-        self.severity += randNum() / 50
+        self.severity += randNum() / 5
         for w_array in self.weights:
             for row in w_array:
                 #for weight in row:
@@ -64,8 +64,8 @@ class NeuralNet:
     def __init__(self,input_size,parent=None):
         if parent == None:
             self.severity = 1
-            self.probability = 0.1
-            self.layer_sizes = [input_size, 48, 64, 64, 64, 64, 64, 1]
+            self.probability = 0.01
+            self.layer_sizes = [input_size, 48, 48, 48, 1]
             self.act_func_layers = [0, 0, 0, 1, 1, 1, 1, 1]
             for i in range(len(self.layer_sizes)-1):
                 self.weights.append(self.create_weight_array(self.layer_sizes[i],self.layer_sizes[i+1]))

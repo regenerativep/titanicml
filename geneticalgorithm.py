@@ -26,7 +26,7 @@ def run_generation(organism):
         mutatedOrg = organism.mutate()
         score = mutatedOrg.getScore() / chunkSize
         childrenCount += 1
-        print("ran a child: " + str(score))
+        print("ran a child: " + str(score) + " | " + str(lastScore))
     return mutatedOrg
 
 
@@ -142,13 +142,14 @@ if __name__ == "__main__":
     
     #create organism
     model = nn.NeuralNet(46).load("nndata.json")
+    #model = nn.NeuralNet(46)
     org = NeuralOrganism(model)
 
     #do natural selection
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 5
+    generations = 10
     childrenCount = 0
     for i in range(generations):
         #childrenCount = 5
