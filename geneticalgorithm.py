@@ -3,21 +3,31 @@ import math
 import neural_net as nn
 import preprocessing as pp
 import pandas as pd
-def run_generation(organism, num_children):
-    children = [organism]
-    for i in range(num_children):
+# def run_generation(organism, num_children):
+#     children = [organism]
+#     for i in range(num_children):
+#         mutatedOrg = organism.mutate()
+#         children.append(mutatedOrg)
+#     bestChild = None
+#     bestScore = None
+#     for child in children:
+#         childScore = None
+#         if bestChild != None:
+#             childScore = child.getScore()
+#         if bestChild == None or bestScore == None or childScore < bestScore:
+#             bestChild = child
+#             bestScore = childScore
+#     return bestChild
+def run_generation(organism):
+    score = 10000
+    childrenCount = 0
+    mutatedOrg = organism
+    while score > lastScore:
         mutatedOrg = organism.mutate()
-        children.append(mutatedOrg)
-    bestChild = None
-    bestScore = None
-    for child in children:
-        childScore = None
-        if bestChild != None:
-            childScore = child.getScore()
-        if bestChild == None or bestScore == None or childScore < bestScore:
-            bestChild = child
-            bestScore = childScore
-    return bestChild
+        score = mutatedOrg.getScore() / chunkSize
+        childrenCount += 1
+        print("ran a child: " + str(score))
+    return mutatedOrg
 
 
 def getCost(desired, actual):
@@ -59,7 +69,7 @@ class NeuralOrganism:
         return totalCost
     def mutate(self):
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
-        newOrg.mutate(probability=prob, severity=sev)
+        newOrg.mutate()
         return NeuralOrganism(newOrg)
 
 if __name__ == "__main__":
@@ -133,35 +143,41 @@ if __name__ == "__main__":
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    sev = 0.1
-    prob = 0.1
     generations = 20
     for i in range(generations):
         childrenCount = 5
-        org = run_generation(org, childrenCount)
+        org = run_generation(org)#, childrenCount)
         if org != lastOrg:
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
         lastScore = org.getScore() / chunkSize
-        print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min((lastScore ** 2) * ( 1 ), 2)
-        prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
+        print(str(i) + ", " + str(childrenCount) + ", prob: " + str(org.model.probability) + ", sev: " + str(org.model.severity) + ", score: " + str(lastScore))
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
             currentChunkIndex -= len(trainingInputChunks)
     
     #test our model
-    numberGood = 0
     strOfResults = ""
+    resultList = []
+    totalOuts = 0
+    for i in range(len(inputDataRows)):
+        row = inputDataRows[i]
+        result = org.model.calculate_output(row)
+        strOfResults += str(result[0][0]) + ", "
+        resultList.append(result)
+        totalOuts += result[0][0]
+    avg = totalOuts / len(inputDataRows)
+
+    numberGood = 0
     for i in range(len(inputDataRows)):
         row = inputDataRows[i]
         dOut = outputDataRows[i]
         
-        result = org.model.calculate_output(row)
+        #result = org.model.calculate_output(row)
+        result = resultList[i]
         #print("inp: " + str(row) + "dOut: " + str(dOut) + "; result: " + str(result))
-        strOfResults += str(result[0][0]) + ", "
         isGood = True
         for j in range(len(result)):
             resItem = result[j][0]
@@ -172,6 +188,7 @@ if __name__ == "__main__":
         if isGood:
             numberGood += 1
     print(strOfResults)
+    print("avg: " + str(avg))
     print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)))
     
     #submission

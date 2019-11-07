@@ -24,20 +24,24 @@ class NeuralNet:
             row = [random.random()-0.5]
             arr.append(row)
         return arr
-    
-    def mutate(self,probability=0.1,severity=0.1):
+    def mutate(self):
+        def randNum():
+            return (random.random()-0.5)*self.severity
+        self.probability += randNum() / 10
+        self.probability = min(1, max(0, self.probability))
+        self.severity += randNum() / 50
         for w_array in self.weights:
             for row in w_array:
                 #for weight in row:
                 for i in range(len(row)):
-                    if random.random() < probability:
-                        row[i] += (random.random()-0.5)*severity
+                    if random.random() < self.probability:
+                        row[i] += randNum()
         for b_array in self.biases:
             for row in b_array:
                 #for bias in row:
                 for i in range(len(row)):
-                    if random.random() < probability:
-                        row[i] += (random.random()-0.5)*severity
+                    if random.random() < self.probability:
+                        row[i] += randNum()
 
     def act_func(self, matrix, ind):
         ret = []
@@ -59,12 +63,16 @@ class NeuralNet:
 
     def __init__(self,input_size,parent=None):
         if parent == None:
+            self.severity = 1
+            self.probability = 0.1
             self.layer_sizes = [input_size, 64, 64, 64, 64, 64, 64, 64, 1]
             self.act_func_layers = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1]
             for i in range(len(self.layer_sizes)-1):
                 self.weights.append(self.create_weight_array(self.layer_sizes[i],self.layer_sizes[i+1]))
                 self.biases.append(self.create_bias_array(self.layer_sizes[i+1]))
         else:
+            self.severity = parent.severity
+            self.probability = parent.probability
             self.layer_sizes = parent.layer_sizes
             self.act_func_layers = parent.act_func_layers
             self.weights = []
