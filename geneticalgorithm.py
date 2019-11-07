@@ -3,6 +3,7 @@ import math
 import neural_net as nn
 import preprocessing as pp
 import pandas as pd
+import numpy as np
 def run_generation(organism, num_children):
     children = [organism]
     for i in range(num_children):
@@ -57,6 +58,18 @@ class NeuralOrganism:
         if prnt:
             print("correct: "+str(totalCorrect))
         return totalCost
+    def getResults(self,prnt=False):
+        totalCost = 0
+        totalCorrect = 0
+        currentInputChunk = trainingInputChunks[currentChunkIndex]
+        currentOutputChunk = trainingOutputChunks[currentChunkIndex]
+        results = []
+        for i in range(len(currentInputChunk)):
+            inp = currentInputChunk[i]
+            dOut = currentOutputChunk[i]
+            result = self.model.calculate_output(inp)
+            results.append(result)
+        return results
     def mutate(self):
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
         newOrg.mutate(probability=prob, severity=sev)
@@ -143,8 +156,21 @@ if __name__ == "__main__":
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
-        lastScore = org.getScore(True) / chunkSize
-        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
+        lastScore = org.getScore() / chunkSize
+
+        #data analysis
+        results = org.getResults()
+        results_array = []
+        for result in results:
+            results_array.append(result[0][0])
+        results_sum = 0
+        results_size = len(results_array)
+        for result in results_array:
+            results_sum += result
+        results_avg = results_sum/results_size
+        results_std_dev = np.std(results_array)
+
+        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore) + ", average: " + str(results_avg) + ", standard deviation: " + str(results_std_dev))
         sev = min((lastScore ** 2) * ( 1 ), 2)
         prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
         lastOrg = org
