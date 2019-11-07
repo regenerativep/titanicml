@@ -3,22 +3,31 @@ import math
 import neural_net as nn
 import preprocessing as pp
 import pandas as pd
-import numpy as np
-def run_generation(organism, num_children):
-    children = [organism]
-    for i in range(num_children):
+# def run_generation(organism, num_children):
+#     children = [organism]
+#     for i in range(num_children):
+#         mutatedOrg = organism.mutate()
+#         children.append(mutatedOrg)
+#     bestChild = None
+#     bestScore = None
+#     for child in children:
+#         childScore = None
+#         if bestChild != None:
+#             childScore = child.getScore()
+#         if bestChild == None or bestScore == None or childScore < bestScore:
+#             bestChild = child
+#             bestScore = childScore
+#     return bestChild
+def run_generation(organism):
+    score = 10000
+    childrenCount = 0
+    mutatedOrg = organism
+    while score > lastScore:
         mutatedOrg = organism.mutate()
-        children.append(mutatedOrg)
-    bestChild = None
-    bestScore = None
-    for child in children:
-        childScore = None
-        if bestChild != None:
-            childScore = child.getScore()
-        if bestChild == None or bestScore == None or childScore < bestScore:
-            bestChild = child
-            bestScore = childScore
-    return bestChild
+        score = mutatedOrg.getScore() / chunkSize
+        childrenCount += 1
+        print("ran a child: " + str(score))
+    return mutatedOrg
 
 
 def getCost(desired, actual):
@@ -49,14 +58,16 @@ class NeuralOrganism:
             for j in results:
                 actualResults += j
             if prnt:
-                print(dOut)
-                print(actualResults)
+                pass
+                #print(dOut)
+                #print(actualResults)
             cost = getCost(dOut, actualResults)
             if abs(dOut[0]-actualResults[0]) < 0.5:
                 totalCorrect += 1
             totalCost += cost
         if prnt:
-            print("correct: "+str(totalCorrect))
+            pass
+            #print("correct: "+str(totalCorrect))
         return totalCost
     def getResults(self,prnt=False):
         totalCost = 0
@@ -72,7 +83,7 @@ class NeuralOrganism:
         return results
     def mutate(self):
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
-        newOrg.mutate(probability=prob, severity=sev)
+        newOrg.mutate()
         return NeuralOrganism(newOrg)
 
 if __name__ == "__main__":
@@ -141,17 +152,19 @@ if __name__ == "__main__":
             nrow.append([item])
         inputTestRows[i] = nrow
     
+    #create organism
+    model = nn.NeuralNet(46).load("nndata.json")
+    org = NeuralOrganism(model)
+
     #do natural selection
-    org = NeuralOrganism(nn.NeuralNet(46))
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    sev = 0.5
-    prob = 0.1
-    generations = 10
+    generations = 5
+    childrenCount = 0
     for i in range(generations):
-        childrenCount = 5
-        org = run_generation(org, childrenCount)
+        #childrenCount = 5
+        org = run_generation(org)#, childrenCount)
         if org != lastOrg:
             gensWithoutChange = 0
         else:
@@ -170,24 +183,37 @@ if __name__ == "__main__":
         results_avg = results_sum/results_size
         results_std_dev = np.std(results_array)
 
-        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore) + ", average: " + str(results_avg) + ", standard deviation: " + str(results_std_dev))
-        sev = min((lastScore ** 2) * ( 1 ), 2)
-        prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
+        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(org.model.probability) + ", sev: " + str(sev) + ", score: " + str(lastScore) + ", average: " + str(results_avg) + ", standard deviation: " + str(results_std_dev))
+        #sev = min((lastScore ** 2) * ( 1 ), 2)
+        #prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
             currentChunkIndex -= len(trainingInputChunks)
+
+    #save model
+    org.model.save("nndata.json")
     
     #test our model
-    numberGood = 0
     strOfResults = ""
+    resultList = []
+    totalOuts = 0
+    for i in range(len(inputDataRows)):
+        row = inputDataRows[i]
+        result = org.model.calculate_output(row)
+        strOfResults += str(result[0][0]) + ", "
+        resultList.append(result)
+        totalOuts += result[0][0]
+    avg = totalOuts / len(inputDataRows)
+
+    numberGood = 0
     for i in range(len(inputDataRows)):
         row = inputDataRows[i]
         dOut = outputDataRows[i]
         
-        result = org.model.calculate_output(row)
+        #result = org.model.calculate_output(row)
+        result = resultList[i]
         #print("inp: " + str(row) + "dOut: " + str(dOut) + "; result: " + str(result))
-        strOfResults += str(result[0][0]) + ", "
         isGood = True
         for j in range(len(result)):
             resItem = result[j][0]
@@ -198,6 +224,7 @@ if __name__ == "__main__":
         if isGood:
             numberGood += 1
     print(strOfResults)
+    print("avg: " + str(avg))
     print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)) + ', ' + str((numberGood / len(inputDataRows) * 100)) + '%')
     
     #submission
