@@ -191,7 +191,7 @@ if __name__ == "__main__":
             numberGood += 1
     print(strOfResults)
     print("avg: " + str(avg))
-    print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)))
+    print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)) + ', ' + str((numberGood / len(inputDataRows) * 100)) + '%')
     
     #submission
     survived_list = []
