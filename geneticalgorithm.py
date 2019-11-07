@@ -135,7 +135,7 @@ if __name__ == "__main__":
     gensWithoutChange = 0
     sev = 0.5
     prob = 0.1
-    generations = 2
+    generations = 10
     for i in range(generations):
         childrenCount = 5
         org = run_generation(org, childrenCount)
@@ -143,9 +143,9 @@ if __name__ == "__main__":
             gensWithoutChange = 0
         else:
             gensWithoutChange += 1
-        lastScore = org.getScore() / chunkSize
-        print(str(i) + ", " + str(childrenCount) + ", prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
-        sev = min((lastScore ** 2) * ( 1000000 ), 20)
+        lastScore = org.getScore(True) / chunkSize
+        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(prob) + ", sev: " + str(sev) + ", score: " + str(lastScore))
+        sev = min((lastScore ** 2) * ( 1 ), 2)
         prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
         lastOrg = org
         currentChunkIndex += 1
