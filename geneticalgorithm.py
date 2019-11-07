@@ -3,6 +3,7 @@ import math
 import neural_net as nn
 import preprocessing as pp
 import pandas as pd
+import numpy as np
 # def run_generation(organism, num_children):
 #     children = [organism]
 #     for i in range(num_children):
@@ -153,14 +154,15 @@ if __name__ == "__main__":
         inputTestRows[i] = nrow
     
     #create organism
-    model = nn.NeuralNet(46).load("nndata.json")
+    #model = nn.NeuralNet(46).load("nndata.json")
+    model = nn.NeuralNet(46)
     org = NeuralOrganism(model)
 
     #do natural selection
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 5
+    generations = 20
     childrenCount = 0
     for i in range(generations):
         #childrenCount = 5
@@ -183,7 +185,7 @@ if __name__ == "__main__":
         results_avg = results_sum/results_size
         results_std_dev = np.std(results_array)
 
-        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(org.model.probability) + ", sev: " + str(sev) + ", score: " + str(lastScore) + ", average: " + str(results_avg) + ", standard deviation: " + str(results_std_dev))
+        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(org.model.probability) + ", sev: " + str(org.model.severity) + ", score: " + str(lastScore) + ", average: " + str(results_avg) + ", standard deviation: " + str(results_std_dev))
         #sev = min((lastScore ** 2) * ( 1 ), 2)
         #prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
         lastOrg = org
