@@ -154,15 +154,15 @@ if __name__ == "__main__":
         inputTestRows[i] = nrow
     
     #create organism
-    model = nn.NeuralNet(46).load("nndata.json")
-    #model = nn.NeuralNet(46)
+    #model = nn.NeuralNet(46).load("nndata.json")
+    model = nn.NeuralNet(46)
     org = NeuralOrganism(model)
 
     #do natural selection
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 10
+    generations = 5
     childrenCount = 0
     for i in range(generations):
         org = run_generation(org)
@@ -185,6 +185,11 @@ if __name__ == "__main__":
         results_std_dev = np.std(results_array)
 
         print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(org.model.probability) + ", sev: " + str(org.model.severity) + ", score: " + str(lastScore) + ", average: " + str(results_avg) + ", standard deviation: " + str(results_std_dev))
+<<<<<<< HEAD
+=======
+        #sev = min((lastScore ** 2) * ( 1 ), 2)
+        #prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
+>>>>>>> 051ac37ef9c9ead87c04664a3dbc0aa84b5005a5
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
