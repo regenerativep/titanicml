@@ -132,7 +132,7 @@ if __name__ == "__main__":
     #chunk training data
     trainingInputChunks = []
     trainingOutputChunks = []
-    chunkSize = len(inputDataRows)-1 #no chunking
+    chunkSize = len(inputDataRows) - 1 #no chunking
     #chunkSize = 384
     chunkItems = []
     chunkOutItems = []
