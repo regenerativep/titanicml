@@ -28,6 +28,7 @@ def run_generation(organism):
     mutatedOrg = organism
     complete = False
     def simulateChild(organism):
+        nonlocal mutatedOrg
         global complete, childrenCount, score, lastScore
         while not complete:
             childOrganism = organism.mutate()
@@ -181,7 +182,7 @@ if __name__ == "__main__":
     global lastScore
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 5
+    generations = 20
     childrenCount = 0
     for i in range(generations):
         org = run_generation(org)
