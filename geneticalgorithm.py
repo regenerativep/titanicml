@@ -1,5 +1,6 @@
 import random
 import math
+import threading as th
 import neural_net as nn
 import preprocessing as pp
 import pandas as pd
@@ -20,16 +21,33 @@ import numpy as np
 #             bestScore = childScore
 #     return bestChild
 def run_generation(organism):
-    score = 10000
+    global score, childrenCount, complete, lastScore
+    score = 100000
     childrenCount = 0
+    maxThreads = 8
     mutatedOrg = organism
-    while score > lastScore:
-        mutatedOrg = organism.mutate()
-        score = mutatedOrg.getScore() / chunkSize
-        childrenCount += 1
-        print("ran a child: " + str(score) + " | " + str(lastScore))
+    complete = False
+    def simulateChild(organism):
+        global complete, childrenCount, score, lastScore
+        while not complete:
+            childOrganism = organism.mutate()
+            score = childOrganism.getScore() / chunkSize
+            childrenCount += 1
+            print("ran a child: " + str(score) + " | " + str(lastScore))
+            if score < lastScore:
+                complete = True
+                lastScore = score
+                mutatedOrg = childOrganism
+    children = []
+    for i in range(maxThreads):
+        child = th.Thread(target=simulateChild,args=(organism,))
+        children.append(child)
+    for child in children:
+        child.start()
+    for child in children:
+        child.join()
+    mutatedOrg.model.save("nndata.json")
     return mutatedOrg
-
 
 def getCost(desired, actual):
     if len(desired) != len(actual):
@@ -113,8 +131,8 @@ if __name__ == "__main__":
     #chunk training data
     trainingInputChunks = []
     trainingOutputChunks = []
-    #chunkSize = len(inputDataRows) #no chunking
-    chunkSize = 384
+    chunkSize = len(inputDataRows)-1 #no chunking
+    #chunkSize = 384
     chunkItems = []
     chunkOutItems = []
     dataToChunk = []
@@ -154,12 +172,13 @@ if __name__ == "__main__":
         inputTestRows[i] = nrow
     
     #create organism
-    #model = nn.NeuralNet(46).load("nndata.json")
-    model = nn.NeuralNet(46)
+    model = nn.NeuralNet(46).load("nndata.json")
+    #model = nn.NeuralNet(46)
     org = NeuralOrganism(model)
 
     #do natural selection
     lastOrg = org
+    global lastScore
     lastScore = 1000000
     gensWithoutChange = 0
     generations = 5
@@ -235,7 +254,7 @@ if __name__ == "__main__":
     #print(strOfResults)
     print("tests good for " + str(numSurvivedCorrect)+"/"+str(totalSurvived)+" survival predictions")
     print("tests good for " + str(numberGood - numSurvivedCorrect)+"/"+str(len(inputDataRows)-totalSurvived)+" death predictions")
-    print(strOfResults)
+    #print(strOfResults)
     print("avg: " + str(avg))
     print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)) + ', ' + str((numberGood / len(inputDataRows) * 100)) + '%')
     
