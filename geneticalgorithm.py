@@ -24,7 +24,7 @@ def run_generation(organism):
     global score, childrenCount, complete, lastScore
     score = 100000
     childrenCount = 0
-    maxThreads = 8
+    maxThreads = 4
     mutatedOrg = organism
     complete = False
     def simulateChild(organism):
@@ -181,7 +181,7 @@ if __name__ == "__main__":
     global lastScore
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 7
+    generations = 20
     childrenCount = 0
     for i in range(generations):
         org = run_generation(org)
