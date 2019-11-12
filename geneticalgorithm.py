@@ -26,8 +26,13 @@ def run_generation(organism):
     while score > lastScore:
         mutatedOrg = organism.mutate()
         score = mutatedOrg.getScore() / chunkSize
+        average_gen = 0
+        results_gen = mutatedOrg.getResults()
+        for result_gen in results_gen:
+            average_gen += result_gen[0][0]
+        average_gen = average_gen / len(results)
         childrenCount += 1
-        print("ran a child: " + str(score) + " | " + str(lastScore))
+        print("ran a child: " + str(score) + " | " + str(lastScore) + " | " + str(average_gen))
     return mutatedOrg
 
 
@@ -113,8 +118,8 @@ if __name__ == "__main__":
     #chunk training data
     trainingInputChunks = []
     trainingOutputChunks = []
-    #chunkSize = len(inputDataRows) #no chunking
-    chunkSize = 384
+    chunkSize = len(inputDataRows) - 1 #no chunking
+    #chunkSize = 384
     chunkItems = []
     chunkOutItems = []
     dataToChunk = []
@@ -162,7 +167,7 @@ if __name__ == "__main__":
     lastOrg = org
     lastScore = 1000000
     gensWithoutChange = 0
-    generations = 10
+    generations = 7
     childrenCount = 0
     for i in range(generations):
         #childrenCount = 5
