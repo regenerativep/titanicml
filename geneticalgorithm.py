@@ -184,8 +184,7 @@ if __name__ == "__main__":
     generations = 5
     childrenCount = 0
     for i in range(generations):
-        #childrenCount = 5
-        org = run_generation(org)#, childrenCount)
+        org = run_generation(org)
         if org != lastOrg:
             gensWithoutChange = 0
         else:
@@ -205,8 +204,6 @@ if __name__ == "__main__":
         results_std_dev = np.std(results_array)
 
         print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(org.model.probability) + ", sev: " + str(org.model.severity) + ", score: " + str(lastScore) + ", average: " + str(results_avg) + ", standard deviation: " + str(results_std_dev))
-        #sev = min((lastScore ** 2) * ( 1 ), 2)
-        #prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
