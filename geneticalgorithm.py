@@ -1,5 +1,6 @@
 import random
 import math
+import threading as th
 import neural_net as nn
 import preprocessing as pp
 import pandas as pd
@@ -20,21 +21,33 @@ import numpy as np
 #             bestScore = childScore
 #     return bestChild
 def run_generation(organism):
-    score = 10000
+    global score, childrenCount, complete, lastScore
+    score = 100000
     childrenCount = 0
+    maxThreads = 8
     mutatedOrg = organism
-    while score > lastScore:
-        mutatedOrg = organism.mutate()
-        score = mutatedOrg.getScore() / chunkSize
-        average_gen = 0
-        results_gen = mutatedOrg.getResults()
-        for result_gen in results_gen:
-            average_gen += result_gen[0][0]
-        average_gen = average_gen / len(results)
-        childrenCount += 1
-        print("ran a child: " + str(score) + " | " + str(lastScore) + " | " + str(average_gen))
+    complete = False
+    def simulateChild(organism):
+        global complete, childrenCount, score, lastScore
+        while not complete:
+            childOrganism = organism.mutate()
+            score = childOrganism.getScore() / chunkSize
+            childrenCount += 1
+            print("ran a child: " + str(score) + " | " + str(lastScore))
+            if score < lastScore:
+                complete = True
+                lastScore = score
+                mutatedOrg = childOrganism
+    children = []
+    for i in range(maxThreads):
+        child = th.Thread(target=simulateChild,args=(organism,))
+        children.append(child)
+    for child in children:
+        child.start()
+    for child in children:
+        child.join()
+    mutatedOrg.model.save("nndata.json")
     return mutatedOrg
-
 
 def getCost(desired, actual):
     if len(desired) != len(actual):
@@ -159,19 +172,19 @@ if __name__ == "__main__":
         inputTestRows[i] = nrow
     
     #create organism
-    #model = nn.NeuralNet(46).load("nndata.json")
-    model = nn.NeuralNet(46)
+    model = nn.NeuralNet(46).load("nndata.json")
+    #model = nn.NeuralNet(46)
     org = NeuralOrganism(model)
 
     #do natural selection
     lastOrg = org
+    global lastScore
     lastScore = 1000000
     gensWithoutChange = 0
     generations = 7
     childrenCount = 0
     for i in range(generations):
-        #childrenCount = 5
-        org = run_generation(org)#, childrenCount)
+        org = run_generation(org)
         if org != lastOrg:
             gensWithoutChange = 0
         else:
@@ -191,8 +204,6 @@ if __name__ == "__main__":
         results_std_dev = np.std(results_array)
 
         print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(org.model.probability) + ", sev: " + str(org.model.severity) + ", score: " + str(lastScore) + ", average: " + str(results_avg) + ", standard deviation: " + str(results_std_dev))
-        #sev = min((lastScore ** 2) * ( 1 ), 2)
-        #prob = min((lastScore ** 2) * ( 2 / 1 ) / childrenCount, 0.9)
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
@@ -240,7 +251,7 @@ if __name__ == "__main__":
     #print(strOfResults)
     print("tests good for " + str(numSurvivedCorrect)+"/"+str(totalSurvived)+" survival predictions")
     print("tests good for " + str(numberGood - numSurvivedCorrect)+"/"+str(len(inputDataRows)-totalSurvived)+" death predictions")
-    print(strOfResults)
+    #print(strOfResults)
     print("avg: " + str(avg))
     print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)) + ', ' + str((numberGood / len(inputDataRows) * 100)) + '%')
     
