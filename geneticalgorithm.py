@@ -180,7 +180,7 @@ if __name__ == "__main__":
     #do natural selection
     lastOrg = org
     global lastScore
-    lastScore = 1000000
+    lastScore = org.getScore() / chunkSize
     gensWithoutChange = 0
     generations = 20
     childrenCount = 0
@@ -211,7 +211,7 @@ if __name__ == "__main__":
             currentChunkIndex -= len(trainingInputChunks)
 
     #save model
-    org.model.save("nndata.json")
+    #org.model.save("nndata.json")
     
     #test our model
     numberGood = 0
