@@ -5,48 +5,62 @@ import neural_net as nn
 import preprocessing as pp
 import pandas as pd
 import numpy as np
-# def run_generation(organism, num_children):
-#     children = [organism]
-#     for i in range(num_children):
-#         mutatedOrg = organism.mutate()
-#         children.append(mutatedOrg)
-#     bestChild = None
-#     bestScore = None
-#     for child in children:
-#         childScore = None
-#         if bestChild != None:
-#             childScore = child.getScore()
-#         if bestChild == None or bestScore == None or childScore < bestScore:
-#             bestChild = child
-#             bestScore = childScore
-#     return bestChild
+import time
+
+global message_queue, message_loop_thread, message_loop_active
+message_queue = []
+message_loop_thread = None
+message_loop_active = False
+def print_message(msg):
+    global message_queue
+    message_queue.append(msg)
+def run_message_loop():
+    global message_queue, message_loop_thread, message_loop_active
+    def msg_loop():
+        global message_queue, message_loop_active
+        while message_loop_active:
+            while len(message_queue) > 0:
+                print(message_queue[0])
+                message_queue = message_queue[1:]
+            time.sleep(0.5)
+    message_loop_thread = th.Thread(target=msg_loop, args=())
+    message_loop_active = True
+    message_loop_thread.start()
+    print_message("began message loop")
+
+def stop_message_loop():
+    global message_loop_thread, message_loop_active
+    message_loop_active = False
+    message_loop_thread.join()
+
 def run_generation(organism):
     global score, childrenCount, complete, lastScore
     score = 100000
     childrenCount = 0
-    maxThreads = 8
+    maxThreads = 16
     mutatedOrg = organism
     complete = False
     def simulateChild(organism):
-        nonlocal mutatedOrg
         global complete, childrenCount, score, lastScore
         while not complete:
             childOrganism = organism.mutate()
             score = childOrganism.getScore() / chunkSize
             childrenCount += 1
-            print("ran a child: " + str(score) + " | " + str(lastScore))
+            print_message("ran a child: " + padNumber(str(score), 19, "0") + " | " + padNumber(str(lastScore), 19, "0"))
             if score < lastScore:
                 complete = True
                 lastScore = score
                 mutatedOrg = childOrganism
+                print_message("found child")
     children = []
     for i in range(maxThreads):
         child = th.Thread(target=simulateChild,args=(organism,))
         children.append(child)
     for child in children:
         child.start()
-    for child in children:
-        child.join()
+    while len(children) > 0:
+        children[0].join()
+        children = children[1:]
     mutatedOrg.model.save("nndata.json")
     return mutatedOrg
 
@@ -79,15 +93,15 @@ class NeuralOrganism:
                 actualResults += j
             if prnt:
                 pass
-                #print(dOut)
-                #print(actualResults)
+                #print_message(dOut)
+                #print_message(actualResults)
             cost = getCost(dOut, actualResults)
             if abs(dOut[0]-actualResults[0]) < 0.5:
                 totalCorrect += 1
             totalCost += cost
         if prnt:
             pass
-            #print("correct: "+str(totalCorrect))
+            #print_message("correct: "+str(totalCorrect))
         return totalCost
     def getResults(self,prnt=False):
         totalCost = 0
@@ -105,8 +119,26 @@ class NeuralOrganism:
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
         newOrg.mutate()
         return NeuralOrganism(newOrg)
+def thsize(num):
+    snum = str(num)
+    suffix = "th"
+    lastChar = snum[-1]
+    if len(snum) <= 1 or snum[-2] != "1":
+        if lastChar == "1":
+            suffix = "st"
+        elif lastChar == "2":
+            suffix = "nd"
+        elif lastChar == "3":
+            suffix = "rd"
+    return snum + suffix
+
+def padNumber(snum, target_count, pad):
+    while len(snum) < target_count:
+        snum += pad
+    return snum
 
 if __name__ == "__main__":
+    run_message_loop()
     #load data
     #training data
     column_names = ["PassengerId", "Survived", "Pclass", "Name", "Sex", "Age", "SibSp", "Parch", "Ticket", "Fare", "Cabin", "Embarked"]
@@ -182,9 +214,10 @@ if __name__ == "__main__":
     global lastScore
     lastScore = org.getScore() / chunkSize
     gensWithoutChange = 0
-    generations = 20
+    generations = 50
     childrenCount = 0
     for i in range(generations):
+        print_message("beginning " + thsize(i) + " generation")
         org = run_generation(org)
         if org != lastOrg:
             gensWithoutChange = 0
@@ -204,7 +237,7 @@ if __name__ == "__main__":
         results_avg = results_sum/results_size
         results_std_dev = np.std(results_array)
 
-        print(str(i) + "th gen, " + str(childrenCount) + " children, prob: " + str(org.model.probability) + ", sev: " + str(org.model.severity) + ", score: " + str(lastScore) + ", average: " + str(results_avg) + ", standard deviation: " + str(results_std_dev))
+        print_message(thsize(i) + " generation completed\r\n-" + str(childrenCount) + " children\r\n-prob: " + str(org.model.probability) + "\r\n-sev: " + str(org.model.severity) + "\r\n-score: " + str(lastScore) + "\r\n-average: " + str(results_avg) + "\r\n-standard deviation: " + str(results_std_dev))
         lastOrg = org
         currentChunkIndex += 1
         while currentChunkIndex >= len(trainingInputChunks):
@@ -235,7 +268,7 @@ if __name__ == "__main__":
         
         #result = org.model.calculate_output(row)
         result = resultList[i]
-        #print("inp: " + str(row) + "dOut: " + str(dOut) + "; result: " + str(result))
+        #print_message("inp: " + str(row) + "dOut: " + str(dOut) + "; result: " + str(result))
         isGood = True
         for j in range(len(result)):
             resItem = result[j][0]
@@ -249,12 +282,12 @@ if __name__ == "__main__":
                     numSurvivedCorrect += 1
         if isGood:
             numberGood += 1
-    #print(strOfResults)
-    print("tests good for " + str(numSurvivedCorrect)+"/"+str(totalSurvived)+" survival predictions")
-    print("tests good for " + str(numberGood - numSurvivedCorrect)+"/"+str(len(inputDataRows)-totalSurvived)+" death predictions")
-    #print(strOfResults)
-    print("avg: " + str(avg))
-    print("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)) + ', ' + str((numberGood / len(inputDataRows) * 100)) + '%')
+    #print_message(strOfResults)
+    print_message("tests good for " + str(numSurvivedCorrect)+"/"+str(totalSurvived)+" survival predictions")
+    print_message("tests good for " + str(numberGood - numSurvivedCorrect)+"/"+str(len(inputDataRows)-totalSurvived)+" death predictions")
+    #print_message(strOfResults)
+    print_message("avg: " + str(avg))
+    print_message("tests are good for " + str(numberGood) + " / " + str(len(inputDataRows)) + ', ' + str((numberGood / len(inputDataRows) * 100)) + '%')
     
     #submission
     survived_list = []
@@ -266,4 +299,5 @@ if __name__ == "__main__":
         survived_list.append(val)
     output_frame = pd.DataFrame({ "PassengerId": test_data["PassengerId"], "Survived": survived_list} )
     output_frame.to_csv("nn_prediction.csv", index=False)
-    print("saved neural net predictions")
+    print_message("saved neural net predictions")
+    stop_message_loop()
