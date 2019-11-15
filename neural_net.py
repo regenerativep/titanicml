@@ -31,18 +31,22 @@ class NeuralNet:
         self.probability += randNum() / 100
         self.probability = min(1, max(0, self.probability))
         self.severity += randNum() / 5
+        has_mutated = False
         for w_array in self.weights:
             for row in w_array:
                 #for weight in row:
                 for i in range(len(row)):
                     if random.random() < self.probability:
+                        has_mutated = True
                         row[i] += randNum()
         for b_array in self.biases:
             for row in b_array:
                 #for bias in row:
                 for i in range(len(row)):
                     if random.random() < self.probability:
+                        has_mutated = True
                         row[i] += randNum()
+        return has_mutated
 
     def act_func(self, matrix, ind):
         ret = []
