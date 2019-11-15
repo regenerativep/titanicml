@@ -34,7 +34,7 @@ def stop_message_loop():
     message_loop_thread.join()
 
 def run_generation(organism):
-    global score, childrenCount, complete, lastScore, mutatedOrg
+    global score, childrenCount, complete, lastScore
     lastScore = organism.getScore() / chunkSize
     childrenCount = 0
     maxThreads = 16
