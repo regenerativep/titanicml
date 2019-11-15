@@ -34,10 +34,10 @@ def stop_message_loop():
     message_loop_thread.join()
 
 def run_generation(organism):
-    global score, childrenCount, complete, lastScore
-    score = 100000
+    global score, childrenCount, complete, lastScore, mutatedOrg
+    lastScore = organism.getScore() / chunkSize
     childrenCount = 0
-    maxThreads = 16
+    maxThreads = 8
     mutatedOrg = organism
     complete = False
     def simulateChild(organism):
@@ -215,6 +215,7 @@ if __name__ == "__main__":
     lastOrg = org
     global lastScore
     lastScore = org.getScore() / chunkSize
+    print("lastScore was "+str(lastScore))
     gensWithoutChange = 0
     generations = 2000
     childrenCount = 0
@@ -246,7 +247,7 @@ if __name__ == "__main__":
             currentChunkIndex -= len(trainingInputChunks)
 
     #save model
-    org.model.save("nndata.json")
+    #org.model.save("nndata.json")
     
     #test our model
     numberGood = 0
