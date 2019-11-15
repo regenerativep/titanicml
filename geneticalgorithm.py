@@ -42,6 +42,7 @@ def run_generation(organism):
     complete = False
     def simulateChild(organism):
         global complete, childrenCount, score, lastScore
+        nonlocal mutatedOrg
         while not complete:
             childOrganism = organism.mutate()
             score = childOrganism.getScore() / chunkSize
@@ -117,7 +118,8 @@ class NeuralOrganism:
         return results
     def mutate(self):
         newOrg = nn.NeuralNet(input_size=-1, parent=self.model)
-        newOrg.mutate()
+        while not newOrg.mutate():
+            pass
         return NeuralOrganism(newOrg)
 def thsize(num):
     snum = str(num)
@@ -214,7 +216,7 @@ if __name__ == "__main__":
     global lastScore
     lastScore = org.getScore() / chunkSize
     gensWithoutChange = 0
-    generations = 50
+    generations = 2000
     childrenCount = 0
     for i in range(generations):
         print_message("beginning " + thsize(i) + " generation")
