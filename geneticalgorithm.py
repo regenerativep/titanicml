@@ -42,7 +42,7 @@ def run_generation(organism):
     complete = False
     def simulateChild(organism):
         global complete, childrenCount, score, lastScore
-        nonlocal mutatedOrg
+        global mutatedOrg
         while not complete:
             childOrganism = organism.mutate()
             score = childOrganism.getScore() / chunkSize
