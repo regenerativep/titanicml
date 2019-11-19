@@ -34,15 +34,15 @@ def stop_message_loop():
     message_loop_thread.join()
 
 def run_generation(organism):
-    global score, childrenCount, complete, lastScore
+    global score, childrenCount, lastScore
     lastScore = organism.getScore() / chunkSize
     childrenCount = 0
     maxThreads = 16
     mutatedOrg = organism
     complete = False
     def simulateChild(organism):
-        global complete, childrenCount, score, lastScore
-        nonlocal mutatedOrg
+        global childrenCount, score, lastScore
+        nonlocal mutatedOrg, complete
         while not complete:
             childOrganism = organism.mutate()
             score = childOrganism.getScore() / chunkSize
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     lastScore = org.getScore() / chunkSize
     print("lastScore was "+str(lastScore))
     gensWithoutChange = 0
-    generations = 2000
+    generations = 10
     childrenCount = 0
     for i in range(generations):
         print_message("beginning " + thsize(i) + " generation")
